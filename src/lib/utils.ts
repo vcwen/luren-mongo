@@ -35,7 +35,7 @@ export const transform = <T>(obj: any, schema: any, strict: boolean = true) => {
       return obj as T
     }
   } else {
-    throw new Error('Invalid')
+    throw ajv.errors
   }
 }
 
