@@ -34,7 +34,13 @@ export class MongoDatasource extends Datasource {
       throw new Error('Model is not valid')
     }
     if (!this._queryExecutors.has(metadata.name)) {
-      this._queryExecutors = this._queryExecutors.set(metadata.name, new MongoQueryExecutor(model))
+      const client = await this.getClient()
+      const db = metadata.database || this._database
+      if (!db) {
+        throw new Error('database name is required')
+      }
+      const collection = client.db(db).collection(metadata.name)
+      this._queryExecutors = this._queryExecutors.set(metadata.name, new MongoQueryExecutor(model, collection))
     }
     return this._queryExecutors.get(metadata.name) as MongoQueryExecutor<T>
   }
