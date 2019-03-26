@@ -1,8 +1,8 @@
 {
   "name": "luren-mongo",
-  "version": "0.0.1",
+  "version": "0.0.1-1",
   "description": "Mongo datasource for Luren",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": "https://github.com/vcwen/luren-mongo.git",
   "author": "Vincent Wen <wenwei1202@gmail.com>",
   "license": "MIT",
