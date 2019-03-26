@@ -1,21 +1,21 @@
 import { List, Map } from 'immutable'
-import { Datasource, IDatasourceOptions, QueryExecutor } from 'luren'
+import { IDatasourceOptions, LurenDatasource } from 'luren'
 import { Constructor } from 'luren/dist/src/types/Constructor'
 import { MongoClient } from 'mongodb'
 import { MetadataKey } from './constants/MetadataKey'
 import { CollectionMetadata } from './decorators/Collection'
 import { IndexMetadata } from './decorators/Index'
 import { getDatabase } from './lib/utils'
-import { MongoQueryExecutor } from './MongoQueryExecutor'
+import { QueryExecutor } from './QueryExecutor'
 
 export interface IMongoDatasourceOptions extends IDatasourceOptions {
   database?: string
   autoIndex?: boolean
 }
-export class MongoDatasource extends Datasource {
+export class Datasource extends LurenDatasource {
   public async
   private _clientPromise: Promise<MongoClient>
-  private _queryExecutors: Map<string, MongoQueryExecutor<any>> = Map()
+  private _queryExecutors: Map<string, QueryExecutor<any>> = Map()
   private _autoIndex: boolean = true
   private _database?: string
   constructor(options: IMongoDatasourceOptions) {
@@ -40,9 +40,9 @@ export class MongoDatasource extends Datasource {
         throw new Error('database name is required')
       }
       const collection = client.db(db).collection(metadata.name)
-      this._queryExecutors = this._queryExecutors.set(metadata.name, new MongoQueryExecutor(model, collection))
+      this._queryExecutors = this._queryExecutors.set(metadata.name, new QueryExecutor(model, collection))
     }
-    return this._queryExecutors.get(metadata.name) as MongoQueryExecutor<T>
+    return this._queryExecutors.get(metadata.name) as QueryExecutor<T>
   }
   public getConnectUrl(options: IMongoDatasourceOptions) {
     if (options.url) {

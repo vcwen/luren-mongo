@@ -1,4 +1,4 @@
-import { QueryExecutor } from 'luren'
+import { LurenQueryExecutor } from 'luren'
 import { Constructor } from 'luren/dist/src/types/Constructor'
 import {
   ChangeStreamOptions,
@@ -28,14 +28,12 @@ import MetadataKey from './constants/MetadataKey'
 import { CollectionMetadata } from './decorators/Collection'
 import { transform } from './lib/utils'
 
-export class MongoQueryExecutor<T> extends QueryExecutor<T> {
+export class QueryExecutor<T> extends LurenQueryExecutor<T> {
   private _collectionMetadata!: CollectionMetadata
   private _collection!: Collection<any>
   constructor(model: Constructor<T>, collection: Collection<any>) {
     super(model)
-    this._collectionMetadata = Reflect.getMetadata(MetadataKey.COLLECTION, model)
     this._collection = collection
-    this._schema = this._collectionMetadata.schema
   }
   public async insertOne(obj: T) {
     return this._collection.insertOne(transform(obj, this._schema))
@@ -169,5 +167,9 @@ export class MongoQueryExecutor<T> extends QueryExecutor<T> {
     options?: ChangeStreamOptions & { startAtClusterTime?: Timestamp; session?: ClientSession }
   ) {
     return this._collection.watch(pipeline, options)
+  }
+  protected getSchema(model: Constructor<T>) {
+    this._collectionMetadata = Reflect.getMetadata(MetadataKey.COLLECTION, model)
+    return this._collectionMetadata.schema
   }
 }
