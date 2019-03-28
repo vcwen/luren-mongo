@@ -169,7 +169,7 @@ export class QueryExecutor<T> extends LurenQueryExecutor<T> {
     return this._collection.watch(pipeline, options)
   }
   protected getSchema(model: Constructor<T>) {
-    this._collectionMetadata = Reflect.getMetadata(MetadataKey.COLLECTION, model)
+    this._collectionMetadata = Reflect.getMetadata(MetadataKey.COLLECTION, model.prototype)
     return this._collectionMetadata.schema
   }
 }
