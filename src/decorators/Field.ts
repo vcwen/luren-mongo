@@ -1,3 +1,4 @@
+import { Map } from 'immutable'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
 
@@ -16,7 +17,9 @@ export class FieldMetadata {
 
 export function Field(options?: IFieldOptions) {
   return (target: object, propertyKey: string) => {
-    const metadata = options || {}
-    Reflect.defineMetadata(MetadataKey.FIELD, metadata, target.constructor, propertyKey)
+    const metadata: FieldMetadata = options || {}
+    let fieldMetadataMap: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, target) || Map()
+    fieldMetadataMap = fieldMetadataMap.set(propertyKey, metadata)
+    Reflect.defineMetadata(MetadataKey.FIELDS, fieldMetadataMap, target)
   }
 }

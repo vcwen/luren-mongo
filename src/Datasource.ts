@@ -29,7 +29,7 @@ export class Datasource extends LurenDatasource {
     return this._clientPromise
   }
   public async getQueryExecutor<T>(model: Constructor<T>): Promise<QueryExecutor<T>> {
-    const metadata: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, model)
+    const metadata: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, model.prototype)
     if (!metadata) {
       throw new Error('Model is not valid')
     }
@@ -55,8 +55,11 @@ export class Datasource extends LurenDatasource {
     }
   }
   public async loadSchema<T>(model: Constructor<T>): Promise<boolean> {
-    const metadataList: List<IndexMetadata> | undefined = Reflect.getMetadata(MetadataKey.INDEX, model)
-    const collectionMetadata: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, model)
+    const metadataList: List<IndexMetadata> | undefined = Reflect.getMetadata(MetadataKey.INDEX, model.prototype)
+    const collectionMetadata: CollectionMetadata | undefined = Reflect.getMetadata(
+      MetadataKey.COLLECTION,
+      model.prototype
+    )
     if (collectionMetadata && metadataList && this._autoIndex) {
       const db = collectionMetadata.database || this._database
       if (!db) {

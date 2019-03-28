@@ -56,5 +56,6 @@ export function Collection(options?: ICollectionOptions) {
       }
     }
     metadata.schema = schema
+    Reflect.defineMetadata(MetadataKey.COLLECTION, metadata, constructor.prototype)
   }
 }
