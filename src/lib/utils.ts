@@ -1,41 +1,48 @@
 import Ajv from 'ajv'
 import _ from 'lodash'
+import { Constructor } from '../types/Constructor'
 const ajv = new Ajv()
 
-export const trimObject = (obj: any, schema: any): any => {
+export const mapObject = (source: any, target: any, schema: any): any => {
+  // source has been validated before this func is invoked
   // DOES NOT support oneOf, anyOf, allOf， for simplicity
+  if (_.isEmpty(source)) {
+    return source
+  }
   if (schema.type === 'object') {
+    if (!target) {
+      target = {}
+    }
     if (_.isEmpty(schema.properties)) {
-      return obj
+      return Object.assign(target, source)
     } else {
-      const trimmed = {} as any
       const props = Object.getOwnPropertyNames(schema.properties)
       for (const prop of props) {
-        trimmed[prop] = trimObject(obj[prop], schema.properties[prop])
+        target[prop] = mapObject(source[prop], target, schema.properties[prop])
       }
-      return obj
+      return target
     }
-  } else if (schema.type === 'array') {
+  } else if (schema.type === 'array' && Array.isArray(source)) {
     if (schema.items) {
-      const arr: any[] = obj
-      return arr.map((item) => trimObject(item, schema.items))
+      return source.map((item) => mapObject(item, undefined, schema.items))
     } else {
-      return obj
+      return source
     }
   } else {
-    return obj
+    return source
   }
 }
-export const transform = <T>(obj: any, schema: any, strict: boolean = true) => {
-  const valid = ajv.validate(schema, obj)
+export const transform = <T>(doc: any, schema: any, constructor: Constructor<T>, strict: boolean = true): T => {
+  const valid = ajv.validate(schema, doc)
   if (valid) {
+    const obj = new constructor()
     if (strict) {
-      return trimObject(obj, schema) as T
+      return mapObject(doc, obj, schema)
     } else {
-      return obj as T
+      return Object.assign(obj, doc)
     }
   } else {
-    throw ajv.errors
+    throw new Error(ajv.errorsText())
   }
 }
 

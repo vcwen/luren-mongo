@@ -10,7 +10,7 @@
     "ajv": "^6.10.0",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
-    "luren": "^0.0.8-2",
+    "luren": "^0.0.8-3",
     "mongodb": "^3.1.13",
     "reflect-metadata": "^0.1.13"
   },

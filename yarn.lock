@@ -469,10 +469,10 @@ lodash@^4.17.10, lodash@^4.17.11:
   resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha1-s56mIp72B+zYniyN8SU2iRysm40=
 
-luren@^0.0.8-2:
-  version "0.0.8-2"
-  resolved "http://registry.npm.taobao.org/luren/download/luren-0.0.8-2.tgz#8accdab120a1846ec7e35b2095ee62ddcae5e414"
-  integrity sha1-iszasSChhG7H41sgle5i3crl5BQ=
+luren@^0.0.8-3:
+  version "0.0.8-3"
+  resolved "http://registry.npm.taobao.org/luren/download/luren-0.0.8-3.tgz?cache=0&other_urls=http%3A%2F%2Fregistry.npm.taobao.org%2Fluren%2Fdownload%2Fluren-0.0.8-3.tgz#b176947d1a5d9de33185a12ea891faeab24e8547"
+  integrity sha1-sXaUfRpdneMxhaEuqJH66rJOhUc=
   dependencies:
     ajv "^6.10.0"
     boom "^7.2.0"

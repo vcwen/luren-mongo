@@ -36,22 +36,22 @@ export class QueryExecutor<T> extends LurenQueryExecutor<T> {
     this._collection = collection
   }
   public async insertOne(obj: T) {
-    return this._collection.insertOne(transform(obj, this._schema))
+    return this._collection.insertOne(transform(obj, this._schema, this._modelConstructor))
   }
   public async insertMany(...objects: T[]) {
-    return this._collection.insertMany(transform(objects, this._schema))
+    return this._collection.insertMany(objects.map((item) => transform(item, this._schema, this._modelConstructor)))
   }
   public async findOne(filter: any) {
     const res = await this._collection.findOne(filter)
     if (res) {
-      return transform<T>(res, {})
+      return transform<T>(res, this._schema, this._modelConstructor)
     } else {
       return undefined
     }
   }
   public async findMany(filter: FilterQuery<T>) {
     const res = await this._collection.find(filter).toArray()
-    return res.map((item) => transform<T>(item, this._schema))
+    return res.map((item) => transform<T>(item, this._schema, this._modelConstructor))
   }
   public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>) {
     return this._collection.updateOne(filter, update)
