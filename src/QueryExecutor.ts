@@ -1,5 +1,4 @@
 import { LurenQueryExecutor } from 'luren'
-import { Constructor } from 'luren/dist/src/types/Constructor'
 import {
   ChangeStreamOptions,
   ClientSession,
@@ -27,6 +26,7 @@ import {
 import MetadataKey from './constants/MetadataKey'
 import { CollectionMetadata } from './decorators/Collection'
 import { transform } from './lib/utils'
+import { Constructor } from './types/Constructor'
 
 export class QueryExecutor<T> extends LurenQueryExecutor<T> {
   private _collectionMetadata!: CollectionMetadata
@@ -124,7 +124,7 @@ export class QueryExecutor<T> extends LurenQueryExecutor<T> {
   public initializeOrderedBulkOp(options?: CommonOptions) {
     return this._collection.initializeOrderedBulkOp(options)
   }
-  public initializeUnorderedBulkOp(options) {
+  public initializeUnorderedBulkOp(options: CommonOptions) {
     return this._collection.initializeUnorderedBulkOp(options)
   }
   public async isCapped(options?: { session: ClientSession }) {
@@ -168,7 +168,7 @@ export class QueryExecutor<T> extends LurenQueryExecutor<T> {
   ) {
     return this._collection.watch(pipeline, options)
   }
-  protected getSchema(model: Constructor<T>) {
+  protected loadSchema(model: Constructor<T>) {
     this._collectionMetadata = Reflect.getMetadata(MetadataKey.COLLECTION, model.prototype)
     return this._collectionMetadata.schema
   }

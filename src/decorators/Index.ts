@@ -1,9 +1,9 @@
 import { List } from 'immutable'
 import _ from 'lodash'
-import { Constructor } from 'luren/dist/src/types/Constructor'
 import { IndexOptions as NativeIndexOptions } from 'mongodb'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
+import { Constructor } from '../types/Constructor'
 export class IndexMetadata {
   public fields!: { [key: string]: 1 | -1 | string }
   public options!: NativeIndexOptions

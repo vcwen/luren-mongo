@@ -137,6 +137,13 @@ debug@^3.1.0:
   dependencies:
     ms "^2.1.1"
 
+debug@^4.1.1:
+  version "4.1.1"
+  resolved "http://registry.npm.taobao.org/debug/download/debug-4.1.1.tgz#3b72260255109c6b589cee050f1d516139664791"
+  integrity sha1-O3ImAlUQnGtYnO4FDx1RYTlmR5E=
+  dependencies:
+    ms "^2.1.1"
+
 debug@~3.1.0:
   version "3.1.0"
   resolved "http://registry.npm.taobao.org/debug/download/debug-3.1.0.tgz?cache=0&other_urls=http%3A%2F%2Fregistry.npm.taobao.org%2Fdebug%2Fdownload%2Fdebug-3.1.0.tgz#5bb5a0672628b64149566ba16819e61518c67261"
@@ -462,13 +469,14 @@ lodash@^4.17.10, lodash@^4.17.11:
   resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha1-s56mIp72B+zYniyN8SU2iRysm40=
 
-luren@^0.0.7-6:
-  version "0.0.7-6"
-  resolved "http://registry.npm.taobao.org/luren/download/luren-0.0.7-6.tgz#ecd32a0abb789196a87f8be09b98359215fbd986"
-  integrity sha1-7NMqCrt4kZaof4vgm5g1khX72YY=
+luren@^0.0.8-2:
+  version "0.0.8-2"
+  resolved "http://registry.npm.taobao.org/luren/download/luren-0.0.8-2.tgz#8accdab120a1846ec7e35b2095ee62ddcae5e414"
+  integrity sha1-iszasSChhG7H41sgle5i3crl5BQ=
   dependencies:
     ajv "^6.10.0"
     boom "^7.2.0"
+    debug "^4.1.1"
     decamelize "^2.0.0"
     formidable "^1.2.1"
     immutable "^4.0.0-rc.12"

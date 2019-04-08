@@ -1,19 +1,18 @@
 import { List, Map } from 'immutable'
 import { IDatasourceOptions, LurenDatasource } from 'luren'
-import { Constructor } from 'luren/dist/src/types/Constructor'
 import { MongoClient } from 'mongodb'
 import { MetadataKey } from './constants/MetadataKey'
 import { CollectionMetadata } from './decorators/Collection'
 import { IndexMetadata } from './decorators/Index'
 import { getDatabase } from './lib/utils'
 import { QueryExecutor } from './QueryExecutor'
+import { Constructor } from './types/Constructor'
 
 export interface IMongoDatasourceOptions extends IDatasourceOptions {
   database?: string
   autoIndex?: boolean
 }
 export class Datasource extends LurenDatasource {
-  public async
   private _clientPromise: Promise<MongoClient>
   private _queryExecutors: Map<string, QueryExecutor<any>> = Map()
   private _autoIndex: boolean = true

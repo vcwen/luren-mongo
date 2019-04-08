@@ -5,8 +5,8 @@ import { MetadataKey } from '../constants/MetadataKey'
 export interface IFieldOptions {
   type?: any
   schema?: any
-  required: boolean
-  default: any
+  required?: boolean
+  default?: any
 }
 
 export class FieldMetadata {

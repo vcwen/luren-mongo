@@ -1,6 +1,6 @@
 {
   "name": "luren-mongo",
-  "version": "0.0.1-1",
+  "version": "0.0.1-4",
   "description": "Mongo datasource for Luren",
   "main": "dist/index.js",
   "repository": "https://github.com/vcwen/luren-mongo.git",
@@ -10,7 +10,7 @@
     "ajv": "^6.10.0",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
-    "luren": "^0.0.7-6",
+    "luren": "^0.0.8-2",
     "mongodb": "^3.1.13",
     "reflect-metadata": "^0.1.13"
   },

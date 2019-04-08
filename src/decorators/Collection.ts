@@ -22,7 +22,7 @@ export class CollectionMetadata {
 }
 
 export function Collection(options?: ICollectionOptions) {
-  return (constructor: Constructor) => {
+  return (constructor: Constructor<any>) => {
     const metadata = new CollectionMetadata()
     metadata.name = _.get(options, 'name') || constructor.name
     metadata.strict = _.get(options, 'strict') || true

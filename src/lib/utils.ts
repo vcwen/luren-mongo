@@ -2,7 +2,7 @@ import Ajv from 'ajv'
 import _ from 'lodash'
 const ajv = new Ajv()
 
-export const trimObject = (obj: any, schema: any) => {
+export const trimObject = (obj: any, schema: any): any => {
   // DOES NOT support oneOf, anyOf, allOf， for simplicity
   if (schema.type === 'object') {
     if (_.isEmpty(schema.properties)) {
