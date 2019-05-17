@@ -6,7 +6,7 @@ import { CollectionMetadata } from './decorators/Collection'
 import { IndexMetadata } from './decorators/Index'
 import { getDatabase } from './lib/utils'
 import { QueryExecutor } from './QueryExecutor'
-import { Constructor } from './types/Constructor'
+import { Constructor } from './types'
 
 export interface IMongoDatasourceOptions extends IDatasourceOptions {
   database?: string
@@ -27,7 +27,7 @@ export class Datasource extends LurenDatasource {
   public async getClient() {
     return this._clientPromise
   }
-  public async getQueryExecutor<T>(model: Constructor<T>): Promise<QueryExecutor<T>> {
+  public async getQueryExecutor<T extends object>(model: Constructor<T>): Promise<QueryExecutor<T>> {
     const metadata: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, model.prototype)
     if (!metadata) {
       throw new Error('Model is not valid')

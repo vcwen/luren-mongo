@@ -1,49 +1,47 @@
-import Ajv from 'ajv'
 import _ from 'lodash'
-import { Constructor } from '../types/Constructor'
-const ajv = new Ajv()
+import { IJsSchema } from 'luren-schema'
+import { getSerialize, getDeserialize, getValidate } from 'luren-schema/dist/lib/utils'
+import { IDataSchema } from '../types'
+// import { Constructor } from '../types'
 
-export const mapObject = (source: any, target: any, schema: any): any => {
-  // source has been validated before this func is invoked
-  // DOES NOT support oneOf, anyOf, allOf， for simplicity
-  if (_.isEmpty(source)) {
-    return source
-  }
-  if (schema.type === 'object') {
-    if (!target) {
-      target = {}
-    }
-    if (_.isEmpty(schema.properties)) {
-      return Object.assign(target, source)
-    } else {
-      const props = Object.getOwnPropertyNames(schema.properties)
-      for (const prop of props) {
-        target[prop] = mapObject(source[prop], target, schema.properties[prop])
-      }
-      return target
-    }
-  } else if (schema.type === 'array' && Array.isArray(source)) {
-    if (schema.items) {
-      return source.map((item) => mapObject(item, undefined, schema.items))
-    } else {
-      return source
-    }
+export const validate = (schema: IJsSchema, data: any): [boolean, string] => {
+  const validateFunc = getValidate(schema)
+  if (validateFunc) {
+    return validateFunc(schema, data)
   } else {
-    return source
+    return [true, '']
   }
 }
-export const transform = <T>(doc: any, schema: any, constructor: Constructor<T>, strict: boolean = true): T => {
-  const valid = ajv.validate(schema, doc)
-  if (valid) {
-    const obj = new constructor()
-    if (strict) {
-      return mapObject(doc, obj, schema)
-    } else {
-      return Object.assign(obj, doc)
-    }
-  } else {
-    throw new Error(ajv.errorsText())
+
+export const serialize = (schema: IDataSchema, data: any) => {
+  let doc = data
+  const serializeFunc = getSerialize(schema)
+  if (serializeFunc) {
+    doc = serializeFunc(schema, data)
   }
+  const [valid, msg] = validate(schema, doc)
+  if (!valid) {
+    throw new Error(msg)
+  }
+  return doc
+}
+
+export const deserialize = (mongoSchema: IJsSchema, doc: any) => {
+  const [valid, msg] = validate(mongoSchema, doc)
+  if (!valid) {
+    throw new Error(msg)
+  }
+  const deserializeFunc = getDeserialize(mongoSchema)
+  if (deserializeFunc) {
+    return deserializeFunc(mongoSchema, doc)
+  } else {
+    return doc
+  }
+}
+
+export const jsSchemaToDataSchema = (jsSchema: IJsSchema): IDataSchema => {
+  const dataSchema: IDataSchema = _.clone(jsSchema)
+  return dataSchema
 }
 
 const regex = /\/(\w+)(\?.*)?$/

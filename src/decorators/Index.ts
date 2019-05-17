@@ -3,7 +3,7 @@ import _ from 'lodash'
 import { IndexOptions as NativeIndexOptions } from 'mongodb'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
-import { Constructor } from '../types/Constructor'
+import { Constructor } from '../types'
 export class IndexMetadata {
   public fields!: { [key: string]: 1 | -1 | string }
   public options!: NativeIndexOptions
