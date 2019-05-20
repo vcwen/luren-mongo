@@ -228,9 +228,9 @@ class ObjectTypeOptions implements ITypeOptions {
       if (typeof doc !== 'object') {
         throw new Error('Data must be object')
       }
-      const obj = schema.classConstructor ? new schema.classConstructor() : {}
       const properties = schema.properties
-      if (properties) {
+      if (properties && !_.isEmpty(properties)) {
+        const obj = schema.classConstructor ? new schema.classConstructor() : {}
         const propNames = Object.getOwnPropertyNames(properties)
         for (const prop of propNames) {
           const propSchema = properties[prop]
@@ -243,10 +243,10 @@ class ObjectTypeOptions implements ITypeOptions {
             Reflect.set(obj, prop, value)
           }
         }
+        return obj
       } else {
-        Object.assign(obj, doc)
+        return doc
       }
-      return obj
     }
   }
 }

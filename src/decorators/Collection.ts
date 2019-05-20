@@ -31,7 +31,7 @@ export function Collection(options?: ICollectionOptions) {
     const props: Map<string, PropMetadata> = Reflect.getMetadata(LurenMetadataKey.PROPS, constructor.prototype) || Map()
     const fieldsOptions: Map<string, IFieldOptions> =
       Reflect.getMetadata(MetadataKey.FIELDS_OPTIONS, constructor.prototype) || Map()
-    const schema: IDataSchema = { type: 'object' }
+    const schema: IDataSchema = { type: 'object', classConstructor: constructor }
     const properties: { [prop: string]: IDataSchema } = {}
     const required: string[] = []
     for (const [prop, fieldOptions] of fieldsOptions) {
