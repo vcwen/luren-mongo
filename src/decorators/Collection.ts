@@ -5,7 +5,7 @@ import { PropMetadata } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
 import { Constructor, IDataSchema } from '../types'
-import { FieldMetadata, IFieldOptions, Field } from './Field'
+import { FieldMetadata, IFieldOptions } from './Field'
 import { normalizeSimpleSchema } from 'luren/dist/lib/utils'
 
 export interface ICollectionOptions {
