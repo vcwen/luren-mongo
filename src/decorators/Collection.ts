@@ -1,12 +1,12 @@
 import { Map } from 'immutable'
 import _ from 'lodash'
 import { MetadataKey as LurenMetadataKey } from 'luren'
-import { PropMetadata } from 'luren-schema'
+import { IPersistSchema, PropMetadata } from 'luren-schema'
+import { normalizeSimpleSchema } from 'luren/dist/lib/utils'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
-import { Constructor, IDataSchema } from '../types'
+import { Constructor } from '../types'
 import { FieldMetadata, IFieldOptions } from './Field'
-import { normalizeSimpleSchema } from 'luren/dist/lib/utils'
 
 export interface ICollectionOptions {
   name?: string
@@ -20,7 +20,7 @@ export class CollectionMetadata {
   public strict: boolean = true
   public database?: string
   public datasource?: string
-  public schema!: IDataSchema
+  public schema!: IPersistSchema
 }
 
 export function Collection(options?: ICollectionOptions) {
@@ -31,12 +31,12 @@ export function Collection(options?: ICollectionOptions) {
     const props: Map<string, PropMetadata> = Reflect.getMetadata(LurenMetadataKey.PROPS, constructor.prototype) || Map()
     const fieldsOptions: Map<string, IFieldOptions> =
       Reflect.getMetadata(MetadataKey.FIELDS_OPTIONS, constructor.prototype) || Map()
-    const schema: IDataSchema = { type: 'object' }
-    const properties: { [prop: string]: IDataSchema } = {}
+    const schema: IPersistSchema = { type: 'object', classConstructor: constructor }
+    const properties: { [prop: string]: IPersistSchema } = {}
     const required: string[] = []
     for (const [prop, fieldOptions] of fieldsOptions) {
       const fieldMetadata = new FieldMetadata()
-      let fieldSchema: IDataSchema | undefined
+      let fieldSchema: IPersistSchema | undefined
       if (props.has(prop)) {
         const propMetadata = props.get(prop) as PropMetadata
         fieldSchema = _.cloneDeep(propMetadata.schema)

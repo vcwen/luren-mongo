@@ -1,24 +1,24 @@
 import { Map } from 'immutable'
+import { IPersistSchema } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
-import { IDataSchema } from '../types'
 
 export interface IFieldOptions {
   type?: any
-  schema?: IDataSchema
+  schema?: IPersistSchema
   required?: boolean
   default?: any
-  validate?: (schema: IDataSchema, data: any) => [boolean, string]
-  serialize?: (schema: IDataSchema, data: any) => any
-  deserialize?: (schema: IDataSchema, data: any) => any
+  validate?: (schema: IPersistSchema, data: any) => [boolean, string]
+  serialize?: (schema: IPersistSchema, data: any) => any
+  deserialize?: (schema: IPersistSchema, data: any) => any
 }
 
 export class FieldMetadata {
-  public schema!: IDataSchema
+  public schema!: IPersistSchema
   public required!: boolean
-  public validate?: (schema: IDataSchema, data: any) => [boolean, string]
-  public serialize?: (schema: IDataSchema, data: any) => any
-  public deserialize?: (schema: IDataSchema, data: any) => any
+  public validate?: (schema: IPersistSchema, data: any) => [boolean, string]
+  public serialize?: (schema: IPersistSchema, data: any) => any
+  public deserialize?: (schema: IPersistSchema, data: any) => any
 }
 
 export function Field(options?: IFieldOptions) {
