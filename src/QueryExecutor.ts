@@ -1,4 +1,5 @@
 import { LurenQueryExecutor } from 'luren'
+import { deserialize, serialize } from 'luren-schema'
 import {
   ChangeStreamOptions,
   ClientSession,
@@ -25,8 +26,8 @@ import {
 } from 'mongodb'
 import MetadataKey from './constants/MetadataKey'
 import { CollectionMetadata } from './decorators/Collection'
+import { MongoDataTypes } from './lib/MongoDataTypes'
 import { Constructor } from './types'
-import { serialize, deserialize } from './lib/utils'
 
 export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   private _collectionMetadata!: CollectionMetadata
@@ -36,7 +37,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     this._collection = collection
   }
   public async insertOne(obj: T) {
-    return this._collection.insertOne(serialize(this._schema, obj))
+    return this._collection.insertOne(serialize(this._schema, obj, MongoDataTypes))
   }
   public async insertMany(...objects: T[]) {
     return this._collection.insertMany(objects.map((item) => serialize(this._schema, item)))
@@ -44,14 +45,14 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   public async findOne(filter: any) {
     const res = await this._collection.findOne(filter)
     if (res) {
-      return deserialize(this._schema, res) as T
+      return deserialize(this._schema, res, MongoDataTypes) as T
     } else {
       return undefined
     }
   }
   public async findMany(filter: FilterQuery<T>) {
     const res = await this._collection.find(filter).toArray()
-    return res.map((item) => deserialize(this._schema, item) as T)
+    return res.map((item) => deserialize(this._schema, item, MongoDataTypes) as T)
   }
   public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>) {
     return this._collection.updateOne(filter, update)

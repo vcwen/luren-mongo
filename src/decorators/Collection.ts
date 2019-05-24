@@ -1,8 +1,6 @@
 import { Map } from 'immutable'
 import _ from 'lodash'
-import { MetadataKey as LurenMetadataKey } from 'luren'
-import { IPersistSchema, PropMetadata } from 'luren-schema'
-import { normalizeSimpleSchema } from 'luren/dist/lib/utils'
+import { IPersistSchema, MetadataKey as SchemaMetadataKey, normalizeSimpleSchema, PropMetadata } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
 import { Constructor } from '../types'
@@ -28,7 +26,8 @@ export function Collection(options?: ICollectionOptions) {
     const metadata = new CollectionMetadata()
     metadata.name = _.get(options, 'name', constructor.name)
     metadata.strict = _.get(options, 'strict', true)
-    const props: Map<string, PropMetadata> = Reflect.getMetadata(LurenMetadataKey.PROPS, constructor.prototype) || Map()
+    const props: Map<string, PropMetadata> =
+      Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || Map()
     const fieldsOptions: Map<string, IFieldOptions> =
       Reflect.getMetadata(MetadataKey.FIELDS_OPTIONS, constructor.prototype) || Map()
     const schema: IPersistSchema = { type: 'object', classConstructor: constructor }
