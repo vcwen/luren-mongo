@@ -40,7 +40,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     return this._collection.insertOne(serialize(this._schema, obj, MongoDataTypes))
   }
   public async insertMany(...objects: T[]) {
-    return this._collection.insertMany(objects.map((item) => serialize(this._schema, item)))
+    return this._collection.insertMany(objects.map((item) => serialize(this._schema, item, MongoDataTypes)))
   }
   public async findOne(filter: any) {
     const res = await this._collection.findOne(filter)
