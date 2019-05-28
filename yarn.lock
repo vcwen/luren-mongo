@@ -478,6 +478,15 @@ luren-schema@^0.0.8:
     lodash "^4.17.11"
     reflect-metadata "^0.1.13"
 
+luren-schema@^0.0.9:
+  version "0.0.9"
+  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.0.9.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fluren-schema%2Fdownload%2Fluren-schema-0.0.9.tgz#93f51c097a6f9d9b76021470818bd40a0182fb03"
+  integrity sha1-k/UcCXpvnZt2AhRwgYvUCgGC+wM=
+  dependencies:
+    immutable "^4.0.0-rc.12"
+    lodash "^4.17.11"
+    reflect-metadata "^0.1.13"
+
 luren@^0.0.9:
   version "0.0.9"
   resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.9.tgz#55505e96c28c4b5a154c77fa358588c33f6884e7"
