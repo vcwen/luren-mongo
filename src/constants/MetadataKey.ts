@@ -1,8 +1,8 @@
 export const MetadataKey = {
   COLLECTION: Symbol('COLLECTION'),
+  MONGO_SCHEMA: Symbol('MONGO_SCHEMA'),
   INDEX: Symbol('INDEX'),
-  FIELDS: Symbol('FIELDS'),
-  FIELDS_OPTIONS: Symbol('FIELDS_OPTIONS')
+  FIELDS: Symbol('FIELDS')
 }
 
 export default MetadataKey

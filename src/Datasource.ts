@@ -27,10 +27,10 @@ export class Datasource extends LurenDatasource {
   public async getClient() {
     return this._clientPromise
   }
-  public async getQueryExecutor<T extends Object>(model: Constructor<T>): Promise<QueryExecutor<T>> {
+  public async getQueryExecutor<T extends object>(model: Constructor<T>): Promise<QueryExecutor<T>> {
     const metadata: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, model.prototype)
     if (!metadata) {
-      throw new Error('Model is not valid')
+      throw new Error(`Model:${model.name} is not a collection`)
     }
     if (!this._queryExecutors.has(metadata.name)) {
       const client = await this.getClient()

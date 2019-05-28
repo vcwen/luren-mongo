@@ -13,6 +13,7 @@ import {
   FindOneAndDeleteOption,
   FindOneAndReplaceOption,
   FindOneAndUpdateOption,
+  FindOneOptions,
   GeoHaystackSearchOptions,
   IndexOptions,
   IndexSpecification,
@@ -25,12 +26,11 @@ import {
   UpdateQuery
 } from 'mongodb'
 import MetadataKey from './constants/MetadataKey'
-import { CollectionMetadata } from './decorators/Collection'
+import { MongoSchemaMetadata } from './decorators/MongoSchema'
 import { MongoDataTypes } from './lib/MongoDataTypes'
 import { Constructor } from './types'
 
 export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
-  private _collectionMetadata!: CollectionMetadata
   private _collection!: Collection<any>
   constructor(model: Constructor<T>, collection: Collection<any>) {
     super(model)
@@ -42,16 +42,16 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   public async insertMany(...objects: T[]) {
     return this._collection.insertMany(objects.map((item) => serialize(this._schema, item, MongoDataTypes)))
   }
-  public async findOne(filter: any) {
-    const res = await this._collection.findOne(filter)
+  public async findOne(filter: FilterQuery<T>, options?: FindOneOptions) {
+    const res = await this._collection.findOne(filter, options)
     if (res) {
       return deserialize(this._schema, res, MongoDataTypes) as T
     } else {
       return undefined
     }
   }
-  public async findMany(filter: FilterQuery<T>) {
-    const res = await this._collection.find(filter).toArray()
+  public async findMany(filter: FilterQuery<T>, options?: FindOneOptions) {
+    const res = await this._collection.find(filter, options).toArray()
     return res.map((item) => deserialize(this._schema, item, MongoDataTypes) as T)
   }
   public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>) {
@@ -170,7 +170,11 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     return this._collection.watch(pipeline, options)
   }
   protected loadSchema(model: Constructor<T>) {
-    this._collectionMetadata = Reflect.getMetadata(MetadataKey.COLLECTION, model.prototype)
-    return this._collectionMetadata.schema
+    const mongoSchema: MongoSchemaMetadata | undefined = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, model.prototype)
+    if (mongoSchema) {
+      return mongoSchema.schema
+    } else {
+      throw new Error(`No mongo schema for:${model.name}`)
+    }
   }
 }
