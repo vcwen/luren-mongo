@@ -18,7 +18,10 @@ export const defineMongoSchema = (constructor: Constructor<any>, schema: IPersis
 }
 export const normalizeSimpleSchema = (schema: any): [IPersistSchema, boolean] => {
   return convertSimpleSchemaToJsSchema(schema, (constructor) => {
-    const schemaMetadata: MongoSchemaMetadata | undefined = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, constructor)
+    const schemaMetadata: MongoSchemaMetadata | undefined = Reflect.getMetadata(
+      MetadataKey.MONGO_SCHEMA,
+      constructor.prototype
+    )
     if (schemaMetadata) {
       return schemaMetadata.schema
     }
