@@ -14,10 +14,10 @@
   resolved "http://registry.npm.taobao.org/@types/lodash/download/@types/lodash-4.14.123.tgz#39be5d211478c8dd3bdae98ee75bb7efe4abfe4d"
   integrity sha1-Ob5dIRR4yN072umO51u37+Sr/k0=
 
-"@types/mongodb@^3.1.22":
-  version "3.1.22"
-  resolved "http://registry.npm.taobao.org/@types/mongodb/download/@types/mongodb-3.1.22.tgz#66f96c7acbf7135ce6295a8d6c26f1d97388a84b"
-  integrity sha1-Zvlsesv3E1zmKVqNbCbx2XOIqEs=
+"@types/mongodb@^3.1.27":
+  version "3.1.27"
+  resolved "https://registry.npm.taobao.org/@types/mongodb/download/@types/mongodb-3.1.27.tgz#989a9815f33f2be601a08b982479a36e139539b6"
+  integrity sha1-mJqYFfM/K+YBoIuYJHmjbhOVObY=
   dependencies:
     "@types/bson" "*"
     "@types/node" "*"

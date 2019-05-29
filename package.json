@@ -1,12 +1,13 @@
 {
   "name": "luren-mongo",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Mongo datasource for Luren",
   "main": "dist/index.js",
   "repository": "https://github.com/vcwen/luren-mongo.git",
   "author": "Vincent Wen <wenwei1202@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@types/mongodb": "^3.1.27",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
     "luren": "^0.0.9",
@@ -16,7 +17,6 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.123",
-    "@types/mongodb": "^3.1.22",
     "tslint-config-prettier": "^1.18.0"
   }
 }
