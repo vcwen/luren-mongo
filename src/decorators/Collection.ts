@@ -7,7 +7,7 @@ export interface ICollectionOptions {
   name?: string
   database?: string
   datasource?: string
-  defineSchema?: true
+  useJsSchema?: boolean
 }
 
 export class CollectionMetadata {
@@ -24,8 +24,10 @@ export function Collection(options?: ICollectionOptions) {
     if (options) {
       metadata.database = options.database
       metadata.datasource = options.datasource
-      if (options.defineSchema) {
-        MongoSchema({ name: metadata.name })(constructor)
+      const schema = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, constructor.prototype)
+      if (!schema) {
+        // if schema it not defined yet, then defined it
+        MongoSchema({ name: metadata.name, useJsSchema: options.useJsSchema })(constructor)
       }
     }
     Reflect.defineMetadata(MetadataKey.COLLECTION, metadata, constructor.prototype)

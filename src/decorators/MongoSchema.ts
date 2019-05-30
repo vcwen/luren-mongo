@@ -1,6 +1,6 @@
 import { Map } from 'immutable'
 import _ from 'lodash'
-import { IPersistSchema } from 'luren-schema'
+import { IPersistSchema, MetadataKey as SchemaMetadataKey, PropMetadata, SchemaMetadata } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
 import { FieldMetadata } from './Field'
@@ -10,6 +10,7 @@ export interface IMongoSchemaOptions {
   validate?: (schema: IPersistSchema, data: any) => [boolean, string]
   serialize?: (schema: IPersistSchema, data: any) => any
   deserialize?: (schema: IPersistSchema, data: any) => any
+  useJsSchema?: boolean
   desc?: string
 }
 
@@ -27,21 +28,44 @@ export class MongoSchemaMetadata {
 export function MongoSchema(options?: IMongoSchemaOptions) {
   // tslint:disable-next-line: ban-types
   return (constructor: Function) => {
+    options = options || {}
     const name = _.get(options, 'name', constructor.name)
-    const fieldsMetadata: Map<string, FieldMetadata> =
-      Reflect.getMetadata(MetadataKey.FIELDS, constructor.prototype) || Map()
     const schema: IPersistSchema = { type: 'object', classConstructor: constructor as any }
     const properties: { [prop: string]: IPersistSchema } = {}
-    const required: string[] = []
+    let required: string[] = []
+
+    if (options.useJsSchema) {
+      const propsMetadata: Map<string, PropMetadata> =
+        Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || Map()
+      for (const [prop, propMetadata] of propsMetadata) {
+        if (propMetadata.virtual) {
+          continue
+        }
+        if (propMetadata.required) {
+          required.push(prop)
+        }
+        properties[prop] = propMetadata.schema
+      }
+    }
+    const fieldsMetadata: Map<string, FieldMetadata> =
+      Reflect.getMetadata(MetadataKey.FIELDS, constructor.prototype) || Map()
     for (const [prop, fieldMetadata] of fieldsMetadata) {
       if (fieldMetadata.required) {
-        required.push(prop)
+        if (required.indexOf(prop) === -1) {
+          required.push(prop)
+        }
+      } else {
+        if (required.indexOf(prop) !== -1) {
+          required = required.filter((item) => item !== prop)
+        }
       }
       properties[prop] = fieldMetadata.schema
     }
+
     schema.properties = properties
     schema.required = required
-    const metadata = new MongoSchemaMetadata(name, schema, options ? options.desc : undefined)
+    const desc = options ? options.desc : undefined
+    const metadata = new MongoSchemaMetadata(name, schema, desc)
     Reflect.defineMetadata(MetadataKey.MONGO_SCHEMA, metadata, constructor.prototype)
   }
 }
