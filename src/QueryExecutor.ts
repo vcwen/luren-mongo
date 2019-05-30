@@ -139,8 +139,8 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     return this._collection.listIndexes(options)
   }
   public async mapReduce(
-    map: CollectionMapFunction | string,
-    reduce: CollectionReduceFunction | string,
+    map: CollectionMapFunction<any> | string,
+    reduce: CollectionReduceFunction<any, any> | string,
     options?: MapReduceOptions
   ) {
     return this._collection.mapReduce(map, reduce, options)
