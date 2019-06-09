@@ -48,7 +48,7 @@ export function Field(options?: IFieldOptions) {
       fieldSchema.default = options.default
     }
     const fieldMetadata = new FieldMetadata(fieldSchema)
-    fieldMetadata.required = fieldRequired || true
+    fieldMetadata.required = fieldRequired !== undefined ? fieldRequired : true
     fieldMetadata.validate = options.validate
     fieldMetadata.serialize = options.serialize
     fieldMetadata.deserialize = options.deserialize
