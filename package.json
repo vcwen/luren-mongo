@@ -14,8 +14,8 @@
     "reflect-metadata": "^0.1.13"
   },
   "peerDependencies": {
-    "luren": "^0.0.13",
-    "luren-schema": "^0.0.11"
+    "luren": "0.0.*",
+    "luren-schema": "0.0.*"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.123",
