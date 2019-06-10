@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.0.7"></a>
+## [0.0.7](https://github.com/vcwen/luren-mongo/compare/v0.0.6...v0.0.7) (2019-06-10)
+
+
+### Bug Fixes
+
+* **Field.ts:** fix required default value ([b0200fe](https://github.com/vcwen/luren-mongo/commit/b0200fe))
+* **MongoDataTypes.ts:** fix ObjectId validation ([a9859a2](https://github.com/vcwen/luren-mongo/commit/a9859a2))
+* **package.json:** fix peer dependencies ([e6eac09](https://github.com/vcwen/luren-mongo/commit/e6eac09))
+
+
+
 <a name="0.0.6"></a>
 ## [0.0.6](https://github.com/vcwen/luren-mongo/compare/v0.0.4...v0.0.6) (2019-05-31)
 
