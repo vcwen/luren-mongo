@@ -22,18 +22,17 @@ export function Collection(options?: ICollectionOptions) {
   return (constructor: Function) => {
     const metadata = new CollectionMetadata()
     metadata.name = _.get(options, 'name', constructor.name)
-    if (options) {
-      metadata.database = options.database
-      metadata.datasource = options.datasource
-      const schema = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, constructor.prototype)
-      if (!schema) {
-        // if schema it not defined yet, then defined it
-        MongoSchema({
-          name: metadata.name,
-          useJsSchema: options.useJsSchema,
-          additionalProps: options.additionalProps
-        })(constructor)
-      }
+    options = options = {}
+    metadata.database = options.database
+    metadata.datasource = options.datasource
+    const schema = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, constructor.prototype)
+    if (!schema) {
+      // if schema it not defined yet, then defined it
+      MongoSchema({
+        name: metadata.name,
+        useJsSchema: options.useJsSchema,
+        additionalProps: options.additionalProps
+      })(constructor)
     }
     Reflect.defineMetadata(MetadataKey.COLLECTION, metadata, constructor.prototype)
   }
