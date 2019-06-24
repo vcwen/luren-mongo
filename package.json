@@ -19,6 +19,8 @@
   },
   "devDependencies": {
     "@types/lodash": "^4.14.123",
+    "luren": "^0.0.19",
+    "luren-schema": "^0.0.18",
     "tslint-config-prettier": "^1.18.0"
   }
 }
