@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import { List, Map } from 'immutable'
 import { IPersistSchema } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants/MetadataKey'
@@ -60,4 +60,12 @@ export function Field(options?: IFieldOptions) {
 
 export function Id(options?: IFieldOptions) {
   return Field(options)
+}
+
+export function NotField() {
+  return (target: object, propertyKey: string) => {
+    let ignoredProps: List<string> = Reflect.getMetadata(MetadataKey.IGNORED_PROPS, target) || List()
+    ignoredProps = ignoredProps.push(propertyKey)
+    Reflect.defineMetadata(MetadataKey.IGNORED_PROPS, ignoredProps, target)
+  }
 }
