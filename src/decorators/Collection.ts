@@ -22,7 +22,7 @@ export function Collection(options?: ICollectionOptions) {
   return (constructor: Function) => {
     const metadata = new CollectionMetadata()
     metadata.name = _.get(options, 'name', constructor.name)
-    options = options = {}
+    options = options || {}
     metadata.database = options.database
     metadata.datasource = options.datasource
     const schema = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, constructor.prototype)
