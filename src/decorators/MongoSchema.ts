@@ -1,4 +1,4 @@
-import { Map } from 'immutable'
+import { List, Map } from 'immutable'
 import _ from 'lodash'
 import { IPersistSchema, MetadataKey as SchemaMetadataKey, PropMetadata } from 'luren-schema'
 import 'reflect-metadata'
@@ -11,6 +11,7 @@ export interface IMongoSchemaOptions {
   serialize?: (schema: IPersistSchema, data: any) => any
   deserialize?: (schema: IPersistSchema, data: any) => any
   useJsSchema?: boolean
+  additionalProps?: boolean
   desc?: string
 }
 
@@ -33,12 +34,15 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
     const schema: IPersistSchema = { type: 'object', classConstructor: constructor as any }
     const properties: { [prop: string]: IPersistSchema } = {}
     let required: string[] = []
-
+    if (options.additionalProps) {
+      schema.additionalProperties = true
+    }
     if (options.useJsSchema) {
       const propsMetadata: Map<string, PropMetadata> =
         Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || Map()
+      const ignoredProps: List<string> = Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || List()
       for (const [prop, propMetadata] of propsMetadata) {
-        if (propMetadata.virtual) {
+        if (propMetadata.virtual || ignoredProps.contains(prop)) {
           continue
         }
         if (propMetadata.required) {
