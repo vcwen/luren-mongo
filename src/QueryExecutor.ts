@@ -1,5 +1,5 @@
 import { LurenQueryExecutor } from 'luren'
-import { deserialize, serialize } from 'luren-schema'
+import { deserialize, IJsSchema, normalizeSimpleSchema, serialize } from 'luren-schema'
 import {
   ChangeStreamOptions,
   ClientSession,
@@ -28,10 +28,23 @@ import {
 import MetadataKey from './constants/MetadataKey'
 import { MongoSchemaMetadata } from './decorators/MongoSchema'
 import { MongoDataTypes } from './lib/MongoDataTypes'
-import { Constructor } from './types'
+import { Constructor, IExtraOptions } from './types'
+
+const deserializeDocument = (doc: any, defaultSchema: IJsSchema, options?: IExtraOptions) => {
+  let schema = defaultSchema
+  if (options) {
+    if (options.schema) {
+      schema = options.schema
+    }
+    if (options.type) {
+      ;[schema] = normalizeSimpleSchema(options.type)
+    }
+  }
+  return deserialize(schema, doc, MongoDataTypes)
+}
 
 export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
-  private _collection!: Collection<any>
+  private _collection!: Collection<T>
   constructor(model: Constructor<T>, collection: Collection<any>) {
     super(model)
     this._collection = collection
@@ -42,17 +55,29 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   public async insertMany(...objects: T[]) {
     return this._collection.insertMany(objects.map((item) => serialize(this._schema, item, MongoDataTypes)))
   }
-  public async findOne(filter: FilterQuery<T>, options?: FindOneOptions) {
+  public async findOne(filter: FilterQuery<T>, options?: FindOneOptions): Promise<T | undefined>
+  public async findOne<TSchema = any>(
+    filter: FilterQuery<T>,
+    options?: FindOneOptions,
+    extraOptions?: IExtraOptions
+  ): Promise<TSchema | undefined>
+  public async findOne(filter: FilterQuery<T>, options?: FindOneOptions, extraOptions?: IExtraOptions) {
     const res = await this._collection.findOne(filter, options)
     if (res) {
-      return deserialize(this._schema, res, MongoDataTypes) as T
+      return deserializeDocument(res, this._schema, extraOptions)
     } else {
       return undefined
     }
   }
-  public async findMany(filter: FilterQuery<T>, options?: FindOneOptions) {
+  public async findMany(filter: FilterQuery<T>, options?: FindOneOptions): Promise<T[]>
+  public async findMany<TSchema = any>(
+    filter: FilterQuery<T>,
+    options?: FindOneOptions,
+    extraOptions?: IExtraOptions
+  ): Promise<TSchema[]>
+  public async findMany(filter: FilterQuery<T>, options?: FindOneOptions, extraOptions?: IExtraOptions) {
     const res = await this._collection.find(filter, options).toArray()
-    return res.map((item) => deserialize(this._schema, item, MongoDataTypes) as T)
+    return res.map((item) => deserializeDocument(item, this._schema, extraOptions))
   }
   public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>) {
     return this._collection.updateOne(filter, update)
@@ -76,8 +101,19 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   public async findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options?: FindOneAndUpdateOption) {
     return this._collection.findOneAndUpdate(filter, update, options)
   }
-  public async aggregate(pipeline?: object[], options?: CollectionAggregationOptions) {
-    return this._collection.aggregate(pipeline, options).toArray()
+  public async aggregate(pipeline?: object[], options?: CollectionAggregationOptions): Promise<T[]>
+  public async aggregate<TSchema = any>(
+    pipeline?: object[],
+    options?: CollectionAggregationOptions,
+    extraOptions?: IExtraOptions
+  ): Promise<TSchema[]>
+  public async aggregate<TSchema = any>(
+    pipeline?: object[],
+    options?: CollectionAggregationOptions,
+    extraOptions?: IExtraOptions
+  ) {
+    const result = await this._collection.aggregate<TSchema>(pipeline, options).toArray()
+    return result.map((item) => deserializeDocument(item, this._schema, extraOptions))
   }
   public async bulkWrite(operations: object[], options?: CollectionBulkWriteOptions) {
     return this._collection.bulkWrite(operations, options)
