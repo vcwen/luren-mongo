@@ -496,10 +496,10 @@ luren-schema@^0.0.24:
     lodash "^4.17.11"
     reflect-metadata "^0.1.13"
 
-luren@^0.0.25:
-  version "0.0.25"
-  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.25.tgz#290039917dff036a22144f4fd7c575d750e4fe3d"
-  integrity sha1-KQA5kX3/A2oiFE9P18V111Dk/j0=
+luren@^0.0.32:
+  version "0.0.32"
+  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.32.tgz#f6eff6b90efa79f61f7be7b8f4990e44dfbd506b"
+  integrity sha1-9u/2uQ76efYfe+e49JkORN+9UGs=
   dependencies:
     ajv "^6.10.0"
     boom "^7.3.0"
