@@ -1,6 +1,22 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [0.0.11](https://github.com/vcwen/luren-mongo/compare/v0.0.7...v0.0.11) (2019-07-12)
+
+
+### Bug Fixes
+
+* **Collection:** fix when options is not set ([cdf3e26](https://github.com/vcwen/luren-mongo/commit/cdf3e26))
+* **Collection:** typo ([d4c9bc9](https://github.com/vcwen/luren-mongo/commit/d4c9bc9))
+
+
+### Features
+
+* **Field:** add NotField decorator ([776c573](https://github.com/vcwen/luren-mongo/commit/776c573))
+* **Relation:** add relation ([a17b1fc](https://github.com/vcwen/luren-mongo/commit/a17b1fc))
+
+
 
 <a name="0.0.10"></a>
 ## [0.0.10](https://github.com/vcwen/luren-mongo/compare/v0.0.9...v0.0.10) (2019-06-24)
