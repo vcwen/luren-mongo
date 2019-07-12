@@ -487,19 +487,19 @@ lodash@^4.17.10, lodash@^4.17.11:
   resolved "https://registry.npm.taobao.org/lodash/download/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
   integrity sha1-s56mIp72B+zYniyN8SU2iRysm40=
 
-luren-schema@^0.0.18:
-  version "0.0.18"
-  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.0.18.tgz#aaf9e85338cda8c31614032705a3c5bcb728ee56"
-  integrity sha1-qvnoUzjNqMMWFAMnBaPFvLco7lY=
+luren-schema@^0.0.24:
+  version "0.0.24"
+  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.0.24.tgz?cache=0&sync_timestamp=1562924033358&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fluren-schema%2Fdownload%2Fluren-schema-0.0.24.tgz#92913379b7bbc9d1abe574ce67b6d7c1a7bc9845"
+  integrity sha1-kpEzebe7ydGr5XTOZ7bXwae8mEU=
   dependencies:
     immutable "^4.0.0-rc.12"
     lodash "^4.17.11"
     reflect-metadata "^0.1.13"
 
-luren@^0.0.19:
-  version "0.0.19"
-  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.19.tgz#a8d236db1ac0cac64d2bf05b93bf6b83beac7f10"
-  integrity sha1-qNI22xrAysZNK/Bbk79rg76sfxA=
+luren@^0.0.25:
+  version "0.0.25"
+  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.25.tgz#290039917dff036a22144f4fd7c575d750e4fe3d"
+  integrity sha1-KQA5kX3/A2oiFE9P18V111Dk/j0=
   dependencies:
     ajv "^6.10.0"
     boom "^7.3.0"
@@ -517,6 +517,7 @@ luren@^0.0.19:
     lodash "^4.17.10"
     pluralize "^7.0.0"
     reflect-metadata "^0.1.13"
+    uid-safe "^2.1.5"
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -647,6 +648,11 @@ qs@^6.5.2:
   resolved "https://registry.npm.taobao.org/qs/download/qs-6.7.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fqs%2Fdownload%2Fqs-6.7.0.tgz#41dc1a015e3d581f1621776be31afb2876a9b1bc"
   integrity sha1-QdwaAV49WB8WIXdr4xr7KHapsbw=
 
+random-bytes@~1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npm.taobao.org/random-bytes/download/random-bytes-1.0.0.tgz#4f68a1dc0ae58bd3fb95848c30324db75d64360b"
+  integrity sha1-T2ih3Arli9P7lYSMMDJNt11kNgs=
+
 raw-body@^2.3.3:
   version "2.4.0"
   resolved "https://registry.npm.taobao.org/raw-body/download/raw-body-2.4.0.tgz?cache=0&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fraw-body%2Fdownload%2Fraw-body-2.4.0.tgz#a1ce6fb9c9bc356ca52e89256ab59059e13d0332"
@@ -763,6 +769,13 @@ type-is@^1.6.16:
   dependencies:
     media-typer "0.3.0"
     mime-types "~2.1.24"
+
+uid-safe@^2.1.5:
+  version "2.1.5"
+  resolved "https://registry.npm.taobao.org/uid-safe/download/uid-safe-2.1.5.tgz#2b3d5c7240e8fc2e58f8aa269e5ee49c0857bd3a"
+  integrity sha1-Kz1cckDo/C5Y+Komnl7knAhXvTo=
+  dependencies:
+    random-bytes "~1.0.0"
 
 unpipe@1.0.0:
   version "1.0.0"

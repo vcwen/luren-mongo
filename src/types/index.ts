@@ -1,7 +1,13 @@
 import { IJsSchema } from 'luren-schema'
+import { FindOneOptions } from 'mongodb'
 
-export type Constructor<T> = new (...args: any[]) => T
-export interface IExtraOptions {
+export type Constructor<T = any> = new (...args: any[]) => T
+
+interface IDeserializeOptions {
   type?: any
   schema?: IJsSchema
+  deserialize?: boolean
+}
+export interface IFindOptions<T = any> extends FindOneOptions, IDeserializeOptions {
+  relation?: keyof T | Array<keyof T>
 }
