@@ -9,9 +9,6 @@ export interface IFieldOptions {
   schema?: IPersistSchema
   required?: boolean
   default?: any
-  validate?: (schema: IPersistSchema, data: any) => [boolean, string]
-  serialize?: (schema: IPersistSchema, data: any) => any
-  deserialize?: (schema: IPersistSchema, data: any) => any
 }
 
 export class FieldMetadata {
@@ -19,9 +16,6 @@ export class FieldMetadata {
   public required: boolean
   public id: boolean = false
   public generated: boolean = false // Id option
-  public validate?: (schema: IPersistSchema, data: any) => [boolean, string]
-  public serialize?: (schema: IPersistSchema, data: any) => any
-  public deserialize?: (schema: IPersistSchema, data: any) => any
   constructor(schema: IPersistSchema, required: boolean = true) {
     this.schema = schema
     this.required = required
@@ -49,9 +43,6 @@ export function Field(options?: IFieldOptions) {
     }
     const fieldMetadata = new FieldMetadata(fieldSchema)
     fieldMetadata.required = fieldRequired !== undefined ? fieldRequired : true
-    fieldMetadata.validate = options.validate
-    fieldMetadata.serialize = options.serialize
-    fieldMetadata.deserialize = options.deserialize
     let fieldsMetadata: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, target) || Map()
     fieldsMetadata = fieldsMetadata.set(propertyKey, fieldMetadata)
     Reflect.defineMetadata(MetadataKey.FIELDS, fieldsMetadata, target)
