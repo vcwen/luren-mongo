@@ -9,5 +9,5 @@ interface IDeserializeOptions {
   deserialize?: boolean
 }
 export interface IFindOptions<T = any> extends FindOneOptions, IDeserializeOptions {
-  relation?: keyof T | Array<keyof T>
+  lookup?: keyof T | Array<keyof T>
 }

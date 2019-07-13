@@ -27,6 +27,7 @@ import {
 } from 'mongodb'
 import MetadataKey from './constants/MetadataKey'
 import { DataSource } from './DataSource'
+import { CollectionMetadata } from './decorators/Collection'
 import { MongoSchemaMetadata } from './decorators/MongoSchema'
 import { RelationMetadata } from './decorators/Relation'
 import { MongoDataTypes } from './lib/MongoDataTypes'
@@ -48,33 +49,28 @@ const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, option
   return deserialize(schema, doc, MongoDataTypes)
 }
 
-const join = async (dataSource: DataSource, model: Constructor, prop: string, obj: object, options: IFindOptions) => {
-  const relation: RelationMetadata | undefined = Reflect.getMetadata(MetadataKey.RELATION, model.prototype, prop)
-  if (relation) {
-    const qe = await dataSource.getQueryExecutor(relation.target)
-    const val = Reflect.get(obj, relation.localField)
-    let res: any
-    switch (relation.type) {
-      case 'hasOne':
-      case 'belongsTo':
-        res = await qe.findOne({ [relation.foreignField]: val })
-        break
-      case 'hasMany':
-        res = await qe.find({ [relation.foreignField]: val })
-        break
-    }
-    if (!_.isEmpty(res)) {
-      if (Array.isArray(res)) {
-        for (const item of res) {
-          Reflect.set(obj, prop, deserializeDocument(item, 'targe_schema' as any, options))
-        }
-      } else {
-        Reflect.set(obj, prop, deserializeDocument(res, 'targe_schema' as any, options))
-      }
-    }
-  } else {
-    throw new Error(`No relation for property: ${prop} of ${model.name}`)
+const join = (relation: RelationMetadata, prop: string) => {
+  const collection: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, relation.target)
+  if (!collection) {
+    throw new Error(`Target:${relation.target.name} is not an valid collection`)
   }
+  const pipeline: any[] = []
+  const lookup = {
+    $lookup: {
+      from: relation.target,
+      localField: relation.localField,
+      foreignField: relation.foreignField,
+      as: prop
+    }
+  }
+  pipeline.push(lookup)
+  switch (relation.type) {
+    case 'hasOne':
+    case 'belongsTo':
+      pipeline.push({ $unwind: '$' + prop })
+      break
+  }
+  return pipeline
 }
 
 export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
@@ -92,23 +88,63 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     return this._collection.insertMany(objects.map((item) => serialize(this._schema, item, MongoDataTypes)))
   }
   public async findOne<TSchema = T>(filter: FilterQuery<T>, options?: IFindOptions<T>): Promise<TSchema | undefined> {
-    const res = await this._collection.findOne(filter, options)
-    if (res) {
-      const obj = deserializeDocument(res, this._schema, options)
-      if (options && options.relation) {
-        const relations = Array.isArray(options.relation) ? options.relation : [options.relation]
-        for (const prop of relations) {
-          join(this._dataSource, this._modelConstructor, prop as any, obj, options)
+    if (options && options.lookup) {
+      const pipeline: any[] = []
+      const match = { $match: filter }
+      pipeline.push(match)
+      const relations = Array.isArray(options.lookup) ? options.lookup : [options.lookup]
+      for (const prop of relations) {
+        const relation: RelationMetadata | undefined = Reflect.getMetadata(
+          MetadataKey.RELATION,
+          this._modelConstructor.prototype,
+          prop as any
+        )
+        if (!relation) {
+          throw new Error(`No relation for property: ${prop} of ${this._modelConstructor.name}`)
         }
+        const lookupPipeline = join(relation, prop as string)
+        pipeline.push(...lookupPipeline)
       }
-      return obj
+      const res = await this._collection.aggregate(pipeline).toArray()
+      if (res.length > 0) {
+        return deserializeDocument(res[0], this._schema, options)
+      } else {
+        return undefined
+      }
     } else {
-      return undefined
+      const res = await this._collection.findOne(filter, options)
+      if (res) {
+        const obj = deserializeDocument(res, this._schema, options)
+        return obj
+      } else {
+        return undefined
+      }
     }
   }
   public async find<TSchema = T>(filter: FilterQuery<T>, options?: IFindOptions<T>): Promise<TSchema[]> {
-    const res = await this._collection.find(filter, options).toArray()
-    return res.map((item) => deserializeDocument(item, this._schema, options))
+    if (options && options.lookup) {
+      const pipeline: any[] = []
+      const match = { $match: filter }
+      pipeline.push(match)
+      const relations = Array.isArray(options.lookup) ? options.lookup : [options.lookup]
+      for (const prop of relations) {
+        const relation: RelationMetadata | undefined = Reflect.getMetadata(
+          MetadataKey.RELATION,
+          this._modelConstructor.prototype,
+          prop as any
+        )
+        if (!relation) {
+          throw new Error(`No relation for property: ${prop} of ${this._modelConstructor.name}`)
+        }
+        const lookupPipeline = join(relation, prop as string)
+        pipeline.push(...lookupPipeline)
+      }
+      const res = await this._collection.aggregate(pipeline).toArray()
+      return res.map((item) => deserializeDocument(item, this._schema, options))
+    } else {
+      const res = await this._collection.find(filter, options).toArray()
+      return res.map((item) => deserializeDocument(item, this._schema, options))
+    }
   }
   public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>) {
     return this._collection.updateOne(filter, update)
