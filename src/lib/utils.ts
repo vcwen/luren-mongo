@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { convertSimpleSchemaToJsSchema, IPersistSchema } from 'luren-schema'
-import MetadataKey from '../constants/MetadataKey'
+import { MetadataKey } from '../constants'
 import { MongoSchemaMetadata } from '../decorators/MongoSchema'
 import { Constructor } from '../types'
 

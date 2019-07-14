@@ -1,6 +1,6 @@
 import { Map } from 'immutable'
 import { RelationType } from '../constants'
-import MetadataKey from '../constants/MetadataKey'
+import { MetadataKey } from '../constants'
 import { Constructor } from '../types'
 import { Field, FieldMetadata, IFieldOptions } from './Field'
 

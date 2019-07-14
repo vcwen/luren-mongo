@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable'
 import { IPersistSchema } from 'luren-schema'
 import 'reflect-metadata'
-import { MetadataKey } from '../constants/MetadataKey'
+import { MetadataKey } from '../constants'
 import { normalizeSimpleSchema } from '../lib/utils'
 
 export interface IFieldOptions {

@@ -1,7 +1,7 @@
 import { List, Map } from 'immutable'
 import { IDataSourceOptions, LurenDataSource } from 'luren'
 import { MongoClient } from 'mongodb'
-import { MetadataKey } from './constants/MetadataKey'
+import { MetadataKey } from './constants'
 import { CollectionMetadata } from './decorators/Collection'
 import { IndexMetadata } from './decorators/Index'
 import { getDatabase } from './lib/utils'

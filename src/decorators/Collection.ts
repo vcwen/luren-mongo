@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import 'reflect-metadata'
-import { MetadataKey } from '../constants/MetadataKey'
+import { MetadataKey } from '../constants'
 import { MongoSchema } from './MongoSchema'
 
 export interface ICollectionOptions {

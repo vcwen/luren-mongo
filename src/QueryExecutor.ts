@@ -26,7 +26,7 @@ import {
   UpdateQuery
 } from 'mongodb'
 import { RelationType } from './constants'
-import MetadataKey from './constants/MetadataKey'
+import { MetadataKey } from './constants'
 import { DataSource } from './DataSource'
 import { CollectionMetadata } from './decorators/Collection'
 import { MongoSchemaMetadata } from './decorators/MongoSchema'
