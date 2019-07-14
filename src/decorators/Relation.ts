@@ -1,20 +1,22 @@
+import { Map } from 'immutable'
+import { RelationType } from '../constants'
 import MetadataKey from '../constants/MetadataKey'
 import { Constructor } from '../types'
-import { Field, IFieldOptions } from './Field'
+import { Field, FieldMetadata, IFieldOptions } from './Field'
 
 export interface IRelationOptions {
-  type: string
+  type: RelationType
   localField?: string
   target: Constructor
   foreignField?: string
 }
 
 export class RelationMetadata {
-  public type: string // hasOne, hasMany, belongsTo
+  public type: RelationType
   public localField: string = '_id'
   public target: Constructor
   public foreignField: string = '_id'
-  constructor(type: string, target: Constructor) {
+  constructor(type: RelationType, target: Constructor) {
     this.type = type
     this.target = target
   }
@@ -30,7 +32,11 @@ export function Relation(options: IRelationOptions) {
       relationMetadata.foreignField = options.foreignField
     }
     Reflect.defineMetadata(MetadataKey.RELATION, relationMetadata, target, propertyKey)
-    const fieldOptions: IFieldOptions = { type: options.target, required: false }
-    Field(fieldOptions)(target, propertyKey)
+    const fieldMap: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, target) || Map()
+    if (!fieldMap.has(propertyKey)) {
+      const type = options.type === RelationType.ONE_TO_ONE ? options.target : [options.type]
+      const fieldOptions: IFieldOptions = { type, required: false }
+      Field(fieldOptions)(target, propertyKey)
+    }
   }
 }

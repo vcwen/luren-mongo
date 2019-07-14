@@ -25,6 +25,7 @@ import {
   Timestamp,
   UpdateQuery
 } from 'mongodb'
+import { RelationType } from './constants'
 import MetadataKey from './constants/MetadataKey'
 import { DataSource } from './DataSource'
 import { CollectionMetadata } from './decorators/Collection'
@@ -64,11 +65,8 @@ const join = (relation: RelationMetadata, prop: string) => {
     }
   }
   pipeline.push(lookup)
-  switch (relation.type) {
-    case 'hasOne':
-    case 'belongsTo':
-      pipeline.push({ $unwind: '$' + prop })
-      break
+  if (relation.type === RelationType.ONE_TO_ONE) {
+    pipeline.push({ $unwind: '$' + prop })
   }
   return pipeline
 }
