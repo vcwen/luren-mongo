@@ -2,7 +2,7 @@ import { List, Map } from 'immutable'
 import _ from 'lodash'
 import { IPersistSchema, MetadataKey as SchemaMetadataKey, PropMetadata } from 'luren-schema'
 import 'reflect-metadata'
-import { MetadataKey } from '../constants/MetadataKey'
+import { MetadataKey } from '../constants'
 import { FieldMetadata } from './Field'
 
 export interface IMongoSchemaOptions {

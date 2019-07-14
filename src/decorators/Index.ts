@@ -2,7 +2,7 @@ import { List } from 'immutable'
 import _ from 'lodash'
 import { IndexOptions as NativeIndexOptions } from 'mongodb'
 import 'reflect-metadata'
-import { MetadataKey } from '../constants/MetadataKey'
+import { MetadataKey } from '../constants'
 import { Constructor } from '../types'
 export class IndexMetadata {
   public fields!: { [key: string]: 1 | -1 | string }
