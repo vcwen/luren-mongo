@@ -5,6 +5,7 @@ import { MetadataKey } from './constants'
 import { CollectionMetadata } from './decorators/Collection'
 import { IndexMetadata } from './decorators/Index'
 import { getDatabase } from './lib/utils'
+import { debug } from './lib/utils'
 import { QueryExecutor } from './QueryExecutor'
 import { Constructor } from './types'
 
@@ -19,7 +20,10 @@ export class DataSource extends LurenDataSource {
   private _database?: string
   constructor(options: IMongoDataSourceOptions) {
     super(options)
-    this._clientPromise = MongoClient.connect(this._connectUrl, { useNewUrlParser: true })
+    this._clientPromise = MongoClient.connect(this._connectUrl, { useNewUrlParser: true }).then((client) => {
+      debug(`connected to ${this._connectUrl}`)
+      return client
+    })
     const db = getDatabase(this._connectUrl)
     this._database = db
     this._autoIndex = options.autoIndex || true
@@ -67,6 +71,7 @@ export class DataSource extends LurenDataSource {
       const client = await this.getClient()
       const collection = client.db(db).collection(collectionMetadata.name)
       for (const metadata of metadataList) {
+        debug('create index %o  with options %o', metadata.fields, metadata.options)
         collection.createIndex(metadata.fields, metadata.options)
       }
     }

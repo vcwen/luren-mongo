@@ -8,6 +8,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/mongodb": "^3.1.27",
+    "debug": "^4.1.1",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
     "mongodb": "^3.1.13",
@@ -18,6 +19,7 @@
     "luren-schema": "0.0.*"
   },
   "devDependencies": {
+    "@types/debug": "^4.1.4",
     "@types/lodash": "^4.14.123",
     "luren": "^0.0.32",
     "luren-schema": "^0.0.25",

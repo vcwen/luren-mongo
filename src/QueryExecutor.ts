@@ -32,6 +32,7 @@ import { CollectionMetadata } from './decorators/Collection'
 import { MongoSchemaMetadata } from './decorators/MongoSchema'
 import { RelationMetadata } from './decorators/Relation'
 import { MongoDataTypes } from './lib/MongoDataTypes'
+import { debug } from './lib/utils'
 import { Constructor, IFindOptions } from './types'
 
 const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, options?: IFindOptions<T>) => {
@@ -80,10 +81,14 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     this._dataSource = dataSource
   }
   public async insertOne(obj: T) {
-    return this._collection.insertOne(serialize(this._schema, obj, MongoDataTypes))
+    const doc = serialize(this._schema, obj, MongoDataTypes)
+    debug(`${this._collection.collectionName}.insertOne(%o)`, doc)
+    return this._collection.insertOne(doc)
   }
   public async insertMany(...objects: T[]) {
-    return this._collection.insertMany(objects.map((item) => serialize(this._schema, item, MongoDataTypes)))
+    const docs = objects.map((item) => serialize(this._schema, item, MongoDataTypes))
+    debug(`${this._collection.collectionName}.insertOne(%o)`, docs)
+    return this._collection.insertMany(docs)
   }
   public async findOne<TSchema = T>(filter: FilterQuery<T>, options?: IFindOptions<T>): Promise<TSchema | undefined> {
     if (options && options.lookup) {
@@ -103,6 +108,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
         const lookupPipeline = join(relation, prop as string)
         pipeline.push(...lookupPipeline)
       }
+      debug(`${this._collection.collectionName}.aggregate(%o)`, pipeline)
       const res = await this._collection.aggregate(pipeline).toArray()
       if (res.length > 0) {
         return deserializeDocument(res[0], this._schema, options)
@@ -110,6 +116,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
         return undefined
       }
     } else {
+      debug(`${this._collection.collectionName}.findOne(%o, %o)`, filter, options)
       const res = await this._collection.findOne(filter, options)
       if (res) {
         const obj = deserializeDocument(res, this._schema, options)
@@ -137,9 +144,11 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
         const lookupPipeline = join(relation, prop as string)
         pipeline.push(...lookupPipeline)
       }
+      debug(`${this._collection.collectionName}.aggregate(%o)`, pipeline)
       const res = await this._collection.aggregate(pipeline).toArray()
       return res.map((item) => deserializeDocument(item, this._schema, options))
     } else {
+      debug(`${this._collection.collectionName}.find(%o, %o)`, filter, options)
       const res = await this._collection.find(filter, options).toArray()
       return res.map((item) => deserializeDocument(item, this._schema, options))
     }
