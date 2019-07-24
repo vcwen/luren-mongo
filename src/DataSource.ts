@@ -32,7 +32,7 @@ export class DataSource extends LurenDataSource {
     return this._clientPromise
   }
   public async getQueryExecutor<T extends object>(model: Constructor<T>): Promise<QueryExecutor<T>> {
-    const metadata: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, model.prototype)
+    const metadata: CollectionMetadata | undefined = Reflect.getOwnMetadata(MetadataKey.COLLECTION, model.prototype)
     if (!metadata) {
       throw new Error(`Model:${model.name} is not a collection`)
     }
@@ -59,7 +59,7 @@ export class DataSource extends LurenDataSource {
   }
   public async loadSchema<T>(model: Constructor<T>): Promise<boolean> {
     const metadataList: List<IndexMetadata> | undefined = Reflect.getMetadata(MetadataKey.INDEX, model.prototype)
-    const collectionMetadata: CollectionMetadata | undefined = Reflect.getMetadata(
+    const collectionMetadata: CollectionMetadata | undefined = Reflect.getOwnMetadata(
       MetadataKey.COLLECTION,
       model.prototype
     )

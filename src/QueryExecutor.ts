@@ -52,7 +52,7 @@ const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, option
 }
 
 const join = (relation: RelationMetadata, prop: string) => {
-  const collection: CollectionMetadata | undefined = Reflect.getMetadata(MetadataKey.COLLECTION, relation.target)
+  const collection: CollectionMetadata | undefined = Reflect.getOwnMetadata(MetadataKey.COLLECTION, relation.target)
   if (!collection) {
     throw new Error(`Target:${relation.target.name} is not an valid collection`)
   }
@@ -273,7 +273,10 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     return this._collection.watch(pipeline, options)
   }
   protected loadSchema(model: Constructor<T>) {
-    const mongoSchema: MongoSchemaMetadata | undefined = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, model.prototype)
+    const mongoSchema: MongoSchemaMetadata | undefined = Reflect.getOwnMetadata(
+      MetadataKey.MONGO_SCHEMA,
+      model.prototype
+    )
     if (mongoSchema) {
       return mongoSchema.schema
     } else {
