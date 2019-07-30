@@ -52,14 +52,14 @@ const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, option
 }
 
 const join = (relation: RelationMetadata, prop: string) => {
-  const collection: CollectionMetadata | undefined = Reflect.getOwnMetadata(MetadataKey.COLLECTION, relation.target)
+  const collection: CollectionMetadata | undefined = Reflect.getOwnMetadata(MetadataKey.COLLECTION, relation.target.prototype)
   if (!collection) {
     throw new Error(`Target:${relation.target.name} is not an valid collection`)
   }
   const pipeline: any[] = []
   const lookup = {
     $lookup: {
-      from: relation.target,
+      from: relation.target.name,
       localField: relation.localField,
       foreignField: relation.foreignField,
       as: prop
