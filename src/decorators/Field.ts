@@ -1,22 +1,21 @@
 import { List, Map } from 'immutable'
-import { IPersistSchema } from 'luren-schema'
+import { IJsSchema, normalizeSimpleSchema } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants'
-import { normalizeSimpleSchema } from '../lib/utils'
 
 export interface IFieldOptions {
   type?: any
-  schema?: IPersistSchema
+  schema?: IJsSchema
   required?: boolean
   default?: any
 }
 
 export class FieldMetadata {
-  public schema: IPersistSchema
+  public schema: IJsSchema
   public required: boolean
   public id: boolean = false
   public generated: boolean = false // Id option
-  constructor(schema: IPersistSchema, required: boolean = true) {
+  constructor(schema: IJsSchema, required: boolean = true) {
     this.schema = schema
     this.required = required
   }
@@ -25,7 +24,7 @@ export class FieldMetadata {
 export function Field(options?: IFieldOptions) {
   return (target: object, propertyKey: string) => {
     options = options || {}
-    let fieldSchema: IPersistSchema
+    let fieldSchema: IJsSchema
     let fieldRequired = options.required
     if (options.schema) {
       fieldSchema = options.schema

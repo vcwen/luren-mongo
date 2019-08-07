@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { LurenQueryExecutor } from 'luren'
-import { deserialize, IJsSchema, normalizeSimpleSchema, serialize } from 'luren-schema'
+import { IJsSchema, normalizeSimpleSchema } from 'luren-schema'
 import {
   ChangeStreamOptions,
   ClientSession,
@@ -31,8 +31,7 @@ import { DataSource } from './DataSource'
 import { CollectionMetadata } from './decorators/Collection'
 import { MongoSchemaMetadata } from './decorators/MongoSchema'
 import { RelationMetadata } from './decorators/Relation'
-import { MongoDataTypes } from './lib/MongoDataTypes'
-import { debug } from './lib/utils'
+import { debug, mongoDeserialize, mongoSerialize } from './lib/utils'
 import { Constructor, IFindOptions } from './types'
 
 const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, options?: IFindOptions<T>) => {
@@ -48,11 +47,14 @@ const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, option
       ;[schema] = normalizeSimpleSchema(options.type)
     }
   }
-  return deserialize(schema, doc, MongoDataTypes)
+  return mongoDeserialize(doc, schema)
 }
 
 const join = (relation: RelationMetadata, prop: string) => {
-  const collection: CollectionMetadata | undefined = Reflect.getOwnMetadata(MetadataKey.COLLECTION, relation.target.prototype)
+  const collection: CollectionMetadata | undefined = Reflect.getOwnMetadata(
+    MetadataKey.COLLECTION,
+    relation.target.prototype
+  )
   if (!collection) {
     throw new Error(`Target:${relation.target.name} is not an valid collection`)
   }
@@ -81,12 +83,12 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     this._dataSource = dataSource
   }
   public async insertOne(obj: T) {
-    const doc = serialize(this._schema, obj, MongoDataTypes)
+    const doc = mongoSerialize(obj, this._schema)
     debug(`${this._collection.collectionName}.insertOne(%o)`, doc)
     return this._collection.insertOne(doc)
   }
   public async insertMany(...objects: T[]) {
-    const docs = objects.map((item) => serialize(this._schema, item, MongoDataTypes))
+    const docs = objects.map((item) => mongoSerialize(item, this._schema))
     debug(`${this._collection.collectionName}.insertOne(%o)`, docs)
     return this._collection.insertMany(docs)
   }

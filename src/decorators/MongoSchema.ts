@@ -1,28 +1,27 @@
 import { List, Map } from 'immutable'
 import _ from 'lodash'
-import { IPersistSchema, MetadataKey as SchemaMetadataKey, PropMetadata } from 'luren-schema'
+import { IJsSchema, MetadataKey as SchemaMetadataKey, PropMetadata } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants'
 import { FieldMetadata } from './Field'
 
 export interface IMongoSchemaOptions {
-  name?: string
-  validate?: (schema: IPersistSchema, data: any) => [boolean, string]
-  serialize?: (schema: IPersistSchema, data: any) => any
-  deserialize?: (schema: IPersistSchema, data: any) => any
+  title?: string
   useJsSchema?: boolean
   additionalProps?: boolean
-  desc?: string
+  description?: string
+  examples?: object
 }
 
 export class MongoSchemaMetadata {
-  public name: string
-  public schema: IPersistSchema
-  public desc?: string
-  constructor(name: string, schema: IPersistSchema, desc?: string) {
-    this.name = name
+  public title: string
+  public schema: IJsSchema
+  public description?: string
+  public examples?: object
+  constructor(title: string, schema: IJsSchema, desc?: string) {
+    this.title = title
     this.schema = schema
-    this.desc = desc
+    this.description = desc
   }
 }
 
@@ -30,9 +29,9 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
   // tslint:disable-next-line: ban-types
   return (constructor: Function) => {
     options = options || {}
-    const name = _.get(options, 'name', constructor.name)
-    const schema: IPersistSchema = { type: 'object', classConstructor: constructor as any }
-    const properties: { [prop: string]: IPersistSchema } = {}
+    const title = _.get(options, 'title', constructor.name)
+    const schema: IJsSchema = { type: 'object', classConstructor: constructor as any }
+    const properties: { [prop: string]: IJsSchema } = {}
     let required: string[] = []
     if (options.additionalProps) {
       schema.additionalProperties = true
@@ -68,8 +67,8 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
 
     schema.properties = properties
     schema.required = required
-    const desc = options ? options.desc : undefined
-    const metadata = new MongoSchemaMetadata(name, schema, desc)
+    const desc = options ? options.description : undefined
+    const metadata = new MongoSchemaMetadata(title, schema, desc)
     Reflect.defineMetadata(MetadataKey.MONGO_SCHEMA, metadata, constructor.prototype)
   }
 }
