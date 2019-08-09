@@ -7,7 +7,6 @@
   "author": "Vincent Wen <wenwei1202@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@types/mongodb": "^3.1.27",
     "debug": "^4.1.1",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
@@ -15,13 +14,13 @@
     "reflect-metadata": "^0.1.13"
   },
   "peerDependencies": {
-    "luren": "0.0.*",
     "luren-schema": "0.0.*"
   },
   "devDependencies": {
     "@types/debug": "^4.1.4",
     "@types/lodash": "^4.14.123",
-    "luren": "^0.0.32",
+    "@types/mongodb": "^3.1.27",
+    "luren": "^0.0.35",
     "luren-schema": "^0.0.35",
     "tslint-config-prettier": "^1.18.0"
   }

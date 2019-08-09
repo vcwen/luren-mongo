@@ -24,6 +24,7 @@ export class DataSource extends LurenDataSource {
       debug(`connected to ${this._connectUrl}`)
       return client
     })
+
     const db = getDatabase(this._connectUrl)
     this._database = db
     this._autoIndex = options.autoIndex || true

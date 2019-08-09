@@ -6,7 +6,7 @@ import { MetadataKey } from '../constants'
 import { FieldMetadata } from './Field'
 
 export interface IMongoSchemaOptions {
-  title?: string
+  name?: string
   useJsSchema?: boolean
   additionalProps?: boolean
   description?: string
@@ -14,12 +14,12 @@ export interface IMongoSchemaOptions {
 }
 
 export class MongoSchemaMetadata {
-  public title: string
+  public name: string
   public schema: IJsSchema
   public description?: string
   public examples?: object
-  constructor(title: string, schema: IJsSchema, desc?: string) {
-    this.title = title
+  constructor(name: string, schema: IJsSchema, desc?: string) {
+    this.name = name
     this.schema = schema
     this.description = desc
   }
@@ -29,7 +29,7 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
   // tslint:disable-next-line: ban-types
   return (constructor: Function) => {
     options = options || {}
-    const title = _.get(options, 'title', constructor.name)
+    const name = _.get(options, 'name', constructor.name)
     const schema: IJsSchema = { type: 'object', classConstructor: constructor as any }
     const properties: { [prop: string]: IJsSchema } = {}
     let required: string[] = []
@@ -39,7 +39,7 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
     if (options.useJsSchema) {
       const propsMetadata: Map<string, PropMetadata> =
         Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || Map()
-      const ignoredProps: List<string> = Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || List()
+      const ignoredProps: List<string> = Reflect.getMetadata(MetadataKey.IGNORED_PROPS, constructor.prototype) || List()
       for (const [prop, propMetadata] of propsMetadata) {
         if (propMetadata.virtual || ignoredProps.contains(prop)) {
           continue
@@ -68,7 +68,7 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
     schema.properties = properties
     schema.required = required
     const desc = options ? options.description : undefined
-    const metadata = new MongoSchemaMetadata(title, schema, desc)
+    const metadata = new MongoSchemaMetadata(name, schema, desc)
     Reflect.defineMetadata(MetadataKey.MONGO_SCHEMA, metadata, constructor.prototype)
   }
 }

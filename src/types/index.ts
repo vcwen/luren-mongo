@@ -4,7 +4,7 @@ import { FindOneOptions } from 'mongodb'
 export type Constructor<T = any> = new (...args: any[]) => T
 
 export interface IBsonSchema extends IJsonSchema {
-  bsonType: string
+  bsonType?: string
 }
 interface IDeserializeOptions {
   type?: any

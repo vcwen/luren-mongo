@@ -29,7 +29,7 @@ export function Collection(options?: ICollectionOptions) {
     if (!schema) {
       // if schema it not defined yet, then defined it
       MongoSchema({
-        title: metadata.name,
+        name: metadata.name,
         useJsSchema: options.useJsSchema,
         additionalProps: options.additionalProps
       })(constructor)
