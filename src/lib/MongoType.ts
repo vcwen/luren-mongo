@@ -479,38 +479,3 @@ export class ObjectIdMongoType extends JsType implements IMongoType {
     return new ObjectId(value)
   }
 }
-
-// tslint:disable-next-line: max-classes-per-file
-export class ObjectIdType implements IJsType {
-  public type: string = 'file'
-  public toJsonSchema() {
-    return { type: 'objectId' }
-  }
-  public validate(val: any): [boolean, string] {
-    if (val === undefined || ObjectId.isValid(val)) {
-      return [true, '']
-    } else {
-      return [false, `Invalid ObjectId: ${val}`]
-    }
-  }
-  public serialize(value: ObjectId | undefined, schema: IJsSchema) {
-    if (value === undefined) {
-      return schema.default
-    }
-    const [valid, msg] = this.validate(value)
-    if (!valid) {
-      throw new Error(msg)
-    }
-    return new ObjectId(value).toHexString()
-  }
-  public deserialize(value: any, schema: IJsSchema) {
-    if (value === undefined) {
-      return schema.default
-    }
-    const [valid, msg] = this.validate(value)
-    if (!valid) {
-      throw new Error(msg)
-    }
-    return new ObjectId(value)
-  }
-}

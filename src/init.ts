@@ -1,18 +1,5 @@
-import { DataTypes, IJsSchema } from 'luren-schema'
+import { DataTypes, IJsSchema, IJsType } from 'luren-schema'
 import { ObjectId, ObjectID } from 'mongodb'
-import { MongoDataTypes } from './lib/MongoDataTypes'
-import {
-  AnyMongoType,
-  ArrayMongoType,
-  BooleanMongoType,
-  DateMongoType,
-  IntegerMongoType,
-  NumberMongoType,
-  ObjectIdMongoType,
-  ObjectIdType,
-  ObjectMongoType,
-  StringMongoType
-} from './lib/MongoType'
 import { defineMongoSchema } from './lib/utils'
 
 const objectIdSchema: IJsSchema = {
@@ -21,14 +8,38 @@ const objectIdSchema: IJsSchema = {
 defineMongoSchema(ObjectId, objectIdSchema)
 defineMongoSchema(ObjectID, objectIdSchema)
 
+// tslint:disable-next-line: max-classes-per-file
+export class ObjectIdType implements IJsType {
+  public type: string = 'file'
+  public toJsonSchema() {
+    return { type: 'objectId' }
+  }
+  public validate(val: any): [boolean, string] {
+    if (val === undefined || ObjectId.isValid(val)) {
+      return [true, '']
+    } else {
+      return [false, `Invalid ObjectId: ${val}`]
+    }
+  }
+  public serialize(value: ObjectId | undefined, schema: IJsSchema) {
+    if (value === undefined) {
+      return schema.default
+    }
+    const [valid, msg] = this.validate(value)
+    if (!valid) {
+      throw new Error(msg)
+    }
+    return new ObjectId(value).toHexString()
+  }
+  public deserialize(value: any, schema: IJsSchema) {
+    if (value === undefined) {
+      return schema.default
+    }
+    const [valid, msg] = this.validate(value)
+    if (!valid) {
+      throw new Error(msg)
+    }
+    return new ObjectId(value)
+  }
+}
 DataTypes.register('objectId', new ObjectIdType())
-
-MongoDataTypes.register('any', new AnyMongoType())
-MongoDataTypes.register('string', new StringMongoType())
-MongoDataTypes.register('boolean', new BooleanMongoType())
-MongoDataTypes.register('integer', new IntegerMongoType())
-MongoDataTypes.register('number', new NumberMongoType())
-MongoDataTypes.register('date', new DateMongoType())
-MongoDataTypes.register('array', new ArrayMongoType())
-MongoDataTypes.register('object', new ObjectMongoType())
-MongoDataTypes.register('objectId', new ObjectIdMongoType())

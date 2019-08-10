@@ -1,3 +1,5 @@
+import './init'
+
 export * from './decorators/Collection'
 export * from './decorators/MongoSchema'
 export * from './decorators/Field'
@@ -10,4 +12,3 @@ export * from './constants'
 export { MongoDataTypes } from './lib/MongoDataTypes'
 export * from './lib/utils'
 export { ObjectId, ObjectID } from 'mongodb'
-import './init'
