@@ -13,7 +13,7 @@ describe('MongoSchema', () => {
     const metadata = Reflect.getMetadata(MetadataKey.MONGO_SCHEMA, Test.prototype)
     expect(metadata).toEqual(
       expect.objectContaining({
-        id: 'Test',
+        name: 'Test',
         schema: expect.objectContaining({
           type: 'object',
           classConstructor: expect.any(Function),

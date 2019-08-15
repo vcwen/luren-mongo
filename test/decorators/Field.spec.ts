@@ -12,11 +12,8 @@ describe('Field', () => {
     const props: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, ctrl)
     expect(props.get('name')).toEqual(
       expect.objectContaining({
-        name: 'name',
         required: true,
-        schema: expect.objectContaining({ type: 'string' }),
-        strict: false,
-        private: false
+        schema: expect.objectContaining({ type: 'string' })
       })
     )
   })
@@ -33,9 +30,7 @@ describe('Field', () => {
         required: true,
         schema: expect.objectContaining({
           type: 'number'
-        }),
-        strict: false,
-        private: false
+        })
       })
     )
   })
