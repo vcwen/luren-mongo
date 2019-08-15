@@ -1,12 +1,14 @@
 import _ from 'lodash'
 import { LurenQueryExecutor } from 'luren'
-import { IJsSchema, normalizeSimpleSchema } from 'luren-schema'
+import { IJsSchema, utils } from 'luren-schema'
 import {
   ChangeStreamOptions,
   ClientSession,
   Collection,
   CollectionAggregationOptions,
   CollectionBulkWriteOptions,
+  CollectionInsertManyOptions,
+  CollectionInsertOneOptions,
   CollectionMapFunction,
   CollectionReduceFunction,
   CommonOptions,
@@ -23,6 +25,8 @@ import {
   ReadPreference,
   ReplaceOneOptions,
   Timestamp,
+  UpdateManyOptions,
+  UpdateOneOptions,
   UpdateQuery
 } from 'mongodb'
 import { RelationType } from './constants'
@@ -44,7 +48,7 @@ const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, option
       schema = options.schema
     }
     if (options.type) {
-      ;[schema] = normalizeSimpleSchema(options.type)
+      ;[schema] = utils.convertSimpleSchemaToJsSchema(options.type)
     }
   }
   return mongoDeserialize(doc, schema)
@@ -82,15 +86,15 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     this._collection = collection
     this._dataSource = dataSource
   }
-  public async insertOne(obj: T) {
+  public async insertOne(obj: T, options?: CollectionInsertOneOptions) {
     const doc = mongoSerialize(obj, this._schema)
     debug(`${this._collection.collectionName}.insertOne(%o)`, doc)
-    return this._collection.insertOne(doc)
+    return this._collection.insertOne(doc, options)
   }
-  public async insertMany(...objects: T[]) {
+  public async insertMany(objects: T[], options?: CollectionInsertManyOptions) {
     const docs = objects.map((item) => mongoSerialize(item, this._schema))
-    debug(`${this._collection.collectionName}.insertOne(%o)`, docs)
-    return this._collection.insertMany(docs)
+    debug(`${this._collection.collectionName}.insertOne(%o, %o)`, docs, options)
+    return this._collection.insertMany(docs, options)
   }
   public async findOne<TSchema = T>(filter: FilterQuery<T>, options?: IFindOptions<T>): Promise<TSchema | undefined> {
     if (options && options.lookup) {
@@ -155,18 +159,18 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
       return res.map((item) => deserializeDocument(item, this._schema, options))
     }
   }
-  public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>) {
-    return this._collection.updateOne(filter, update)
+  public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>, options?: UpdateOneOptions) {
+    return this._collection.updateOne(filter, update, options)
   }
-  public async updateMany(filter: FilterQuery<T>, update: UpdateQuery<T>) {
-    return this._collection.updateMany(filter, update)
+  public async updateMany(filter: FilterQuery<T>, update: UpdateQuery<T>, options?: UpdateManyOptions) {
+    return this._collection.updateMany(filter, update, options)
   }
 
-  public async deleteOne(filter: FilterQuery<T>) {
-    return this._collection.deleteOne(filter)
+  public async deleteOne(filter: FilterQuery<T>, options?: CommonOptions & { bypassDocumentValidation?: boolean }) {
+    return this._collection.deleteOne(filter, options)
   }
-  public async deleteMany(filter: FilterQuery<T>) {
-    return this._collection.deleteMany(filter)
+  public async deleteMany(filter: FilterQuery<T>, options?: CommonOptions) {
+    return this._collection.deleteMany(filter, options)
   }
   public async findOneAndDelete(filter: FilterQuery<T>, options?: FindOneAndDeleteOption) {
     return this._collection.findOneAndDelete(filter, options)
