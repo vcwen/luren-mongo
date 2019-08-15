@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.0.22"></a>
+## [0.0.22](https://github.com/vcwen/luren-mongo/compare/v0.0.21...v0.0.22) (2019-08-15)
+
+
+### Bug Fixes
+
+* **DataTypes:** register js schema for ObjectId class ([054a55b](https://github.com/vcwen/luren-mongo/commit/054a55b))
+
+
+
 <a name="0.0.21"></a>
 ## [0.0.21](https://github.com/vcwen/luren-mongo/compare/v0.0.20...v0.0.21) (2019-08-15)
 
