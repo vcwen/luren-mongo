@@ -1,22 +1,14 @@
-# Changelog
+# Change Log
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [0.0.20](https://github.com/vcwen/luren-mongo/compare/v0.0.19...v0.0.20) (2019-07-30)
-
-
-
-### [0.0.19](https://github.com/vcwen/luren-mongo/compare/v0.0.18...v0.0.19) (2019-07-24)
-
-
-
-### [0.0.18](https://github.com/vcwen/luren-mongo/compare/v0.0.16...v0.0.18) (2019-07-24)
+<a name="0.0.21"></a>
+## [0.0.21](https://github.com/vcwen/luren-mongo/compare/v0.0.20...v0.0.21) (2019-08-15)
 
 
 ### Bug Fixes
 
-* **constants:** fix import ([f5918a2](https://github.com/vcwen/luren-mongo/commit/f5918a2))
-* **metadata:** using getOwnMetadata when possible ([808a7a2](https://github.com/vcwen/luren-mongo/commit/808a7a2))
+* **QueryExecutor:** add options ([da441af](https://github.com/vcwen/luren-mongo/commit/da441af))
 
 
 
