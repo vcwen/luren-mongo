@@ -1,4 +1,5 @@
 import { DataTypes, IJsSchema, IJsType } from 'luren-schema'
+import { defineJsSchema } from 'luren-schema/dist/lib/utils'
 import { ObjectId, ObjectID } from 'mongodb'
 import { defineMongoSchema } from './lib/utils'
 
@@ -7,6 +8,8 @@ const objectIdSchema: IJsSchema = {
 }
 defineMongoSchema(ObjectId, objectIdSchema)
 defineMongoSchema(ObjectID, objectIdSchema)
+defineJsSchema(ObjectId, objectIdSchema)
+defineJsSchema(ObjectID, objectIdSchema)
 
 // tslint:disable-next-line: max-classes-per-file
 export class ObjectIdType implements IJsType {
