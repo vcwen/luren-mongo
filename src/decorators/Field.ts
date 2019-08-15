@@ -1,8 +1,7 @@
 import { List, Map } from 'immutable'
-import { IJsSchema, normalizeSimpleSchema } from 'luren-schema'
+import { IJsSchema, utils } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants'
-
 export interface IFieldOptions {
   type?: any
   schema?: IJsSchema
@@ -29,7 +28,7 @@ export function Field(options?: IFieldOptions) {
     if (options.schema) {
       fieldSchema = options.schema
     } else if (options.type) {
-      const [schema, required] = normalizeSimpleSchema(options.type)
+      const [schema, required] = utils.convertSimpleSchemaToJsSchema(options.type)
       fieldSchema = schema
       if (typeof fieldRequired !== 'boolean') {
         fieldRequired = required

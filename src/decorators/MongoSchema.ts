@@ -41,7 +41,7 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
         Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || Map()
       const ignoredProps: List<string> = Reflect.getMetadata(MetadataKey.IGNORED_PROPS, constructor.prototype) || List()
       for (const [prop, propMetadata] of propsMetadata) {
-        if (propMetadata.virtual || ignoredProps.contains(prop)) {
+        if (propMetadata.schema.virtual || ignoredProps.contains(prop)) {
           continue
         }
         if (propMetadata.required) {

@@ -22,8 +22,8 @@
     "@types/lodash": "^4.14.123",
     "@types/mongodb": "^3.1.27",
     "jest": "^24.8.0",
-    "luren": "^0.0.35",
-    "luren-schema": "^0.0.35",
+    "luren": "^0.0.36",
+    "luren-schema": "^0.0.36",
     "ts-jest": "^24.0.2",
     "tslint-config-prettier": "^1.18.0",
     "typescript": "^3.5.3"

@@ -2603,20 +2603,21 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-luren-schema@^0.0.35:
-  version "0.0.35"
-  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.0.35.tgz#fc580a8c29b8feb7bde8ebe71684e63b259c0c73"
-  integrity sha1-/FgKjCm4/re96OvnFoTmOyWcDHM=
+luren-schema@^0.0.36:
+  version "0.0.36"
+  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.0.36.tgz#7dd04caaa3ed5e4c989408a8c4d7124109930fa2"
+  integrity sha1-fdBMqqPtXkyYlAioxNcSQQmTD6I=
   dependencies:
     ajv "^6.10.2"
     immutable "^4.0.0-rc.12"
     lodash "^4.17.11"
+    luxon "^1.17.2"
     reflect-metadata "^0.1.13"
 
-luren@^0.0.35:
-  version "0.0.35"
-  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.35.tgz#1535bd312e26d2d31c9a7a52eb2a5e3b14bdaa84"
-  integrity sha1-FTW9MS4m0tMcmnpS6ypeOxS9qoQ=
+luren@^0.0.36:
+  version "0.0.36"
+  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.36.tgz?cache=0&sync_timestamp=1565853782706&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fluren%2Fdownload%2Fluren-0.0.36.tgz#fa696aaafece1c52c512f68b8373d9d8ed501c54"
+  integrity sha1-+mlqqv7OHFLFEvaLg3PZ2O1QHFQ=
   dependencies:
     ajv "^6.10.0"
     boom "^7.3.0"
@@ -2635,6 +2636,11 @@ luren@^0.0.35:
     pluralize "^7.0.0"
     reflect-metadata "^0.1.13"
     uid-safe "^2.1.5"
+
+luxon@^1.17.2:
+  version "1.17.2"
+  resolved "https://registry.npm.taobao.org/luxon/download/luxon-1.17.2.tgz#95189c450341cfddf5f826ef8c32b5b022943fd5"
+  integrity sha1-lRicRQNBz931+CbvjDK1sCKUP9U=
 
 make-dir@^2.1.0:
   version "2.1.0"

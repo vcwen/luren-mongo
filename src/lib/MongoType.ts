@@ -21,6 +21,29 @@ import { MongoDataTypes } from './MongoDataTypes'
 import { mongoDeserialize, mongoSerialize, mongoValidate } from './utils'
 
 const ajv = new Ajv()
+const allJsonSchemaProps = [
+  'title',
+  'description',
+  'default',
+  'examples',
+  'enum',
+  'const',
+  'format',
+  'pattern',
+  'multipleOf',
+  'minimum',
+  'exclusiveMinimum',
+  'maximum',
+  'exclusiveMaximum',
+  'items',
+  'minItems',
+  'maxItems',
+  'uniqueItems',
+  'additionalItems',
+  'properties',
+  'required',
+  'additionalProperties'
+]
 
 export interface IJsTypeOptions {
   include?: string[]
@@ -69,14 +92,7 @@ export abstract class MongoType extends JsType implements IMongoType {
       }
     }
   }
-  public toJsonSchema(schema: IJsSchema): IJsonSchema {
-    const jsonSchema: IJsonSchema = Object.assign({}, schema)
-    jsonSchema.type = this.type
-    return jsonSchema
-  }
 }
-
-const commonSchemaProps = ['title', 'description', 'default', 'examples', 'enum', 'const']
 
 // tslint:disable-next-line: max-classes-per-file
 export class AnyMongoType extends AnyType implements IMongoType {
@@ -88,38 +104,29 @@ export class AnyMongoType extends AnyType implements IMongoType {
 // tslint:disable-next-line: max-classes-per-file
 export class StringMongoType extends StringType implements IMongoType {
   public toBsonSchema(schema: IJsSchema) {
-    const bsonSchema: IJsonSchema = { bsonType: 'string' }
-    copyProperties(bsonSchema, schema, [
-      ...commonSchemaProps,
-      'multipleOf',
-      'minimum',
-      'exclusiveMinimum',
-      'maximum',
-      'exclusiveMaximum'
-    ])
+    const bsonSchema = this.toJsonSchema(schema)
+    Reflect.deleteProperty(bsonSchema, 'type')
+    bsonSchema.bsonType = 'string'
     return bsonSchema
   }
 }
 
 // tslint:disable-next-line: max-classes-per-file
 export class BooleanMongoType extends BooleanType implements IMongoType {
-  public toBsonSchema() {
-    return { bsonType: 'bool' }
+  public toBsonSchema(schema: IJsSchema) {
+    const bsonSchema = this.toJsonSchema(schema)
+    Reflect.deleteProperty(bsonSchema, 'type')
+    bsonSchema.bsonType = 'bool'
+    return bsonSchema
   }
 }
 
 // tslint:disable-next-line: max-classes-per-file
 export class NumberMongoType extends NumberType implements IMongoType {
   public toBsonSchema(schema: IJsSchema) {
-    const bsonSchema: IBsonSchema = { bsonType: 'number' }
-    copyProperties(bsonSchema, schema, [
-      ...commonSchemaProps,
-      'multipleOf',
-      'minimum',
-      'exclusiveMinimum',
-      'maximum',
-      'exclusiveMaximum'
-    ])
+    const bsonSchema = this.toJsonSchema(schema)
+    Reflect.deleteProperty(bsonSchema, 'type')
+    bsonSchema.bsonType = 'number'
     return bsonSchema
   }
 }
@@ -127,15 +134,9 @@ export class NumberMongoType extends NumberType implements IMongoType {
 // tslint:disable-next-line: max-classes-per-file
 export class IntegerMongoType extends IntegerType implements IMongoType {
   public toBsonSchema(schema: IJsSchema) {
-    const bsonSchema: IBsonSchema = { bsonType: 'long' }
-    copyProperties(bsonSchema, schema, [
-      ...commonSchemaProps,
-      'multipleOf',
-      'minimum',
-      'exclusiveMinimum',
-      'maximum',
-      'exclusiveMaximum'
-    ])
+    const bsonSchema = this.toJsonSchema(schema)
+    Reflect.deleteProperty(bsonSchema, 'long')
+    bsonSchema.bsonType = 'number'
     return bsonSchema
   }
 }
@@ -171,8 +172,9 @@ export class DateMongoType extends DateType implements IMongoType {
     }
   }
   public toBsonSchema(schema: IJsSchema) {
-    const bsonSchema: IBsonSchema = { bsonType: 'date' }
-    copyProperties(bsonSchema, schema, [...commonSchemaProps])
+    const bsonSchema = this.toJsonSchema(schema)
+    Reflect.deleteProperty(bsonSchema, 'type')
+    bsonSchema.bsonType = 'date'
     return bsonSchema
   }
 }
@@ -194,10 +196,10 @@ export class ArrayMongoType extends ArrayType implements IMongoType {
         jsonItems = jsType.toBsonSchema(items)
       }
     }
-    copyProperties(bsonSchema, schema, [...commonSchemaProps, 'minItems', 'maxItems', 'uniqueItems', 'additionalItems'])
     if (jsonItems) {
       bsonSchema.items = jsonItems
     }
+    copyProperties(bsonSchema, schema, allJsonSchemaProps)
     return bsonSchema
   }
   public validate(val: any, schema: IJsSchema, options?: IJsTypeOptions): [boolean, string?] {
@@ -303,7 +305,7 @@ export class ObjectMongoType extends ObjectType implements IMongoType {
         Reflect.set(bsonSchema.properties, prop, jsType.toBsonSchema(propSchema))
       }
     }
-    copyProperties(bsonSchema, schema, ['additionalProperties'])
+    copyProperties(bsonSchema, schema, allJsonSchemaProps)
     return bsonSchema
   }
   public validate(data: any, schema: IJsSchema, options?: IJsTypeOptions): [boolean, string?] {
