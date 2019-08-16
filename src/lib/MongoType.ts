@@ -158,19 +158,21 @@ export class DateMongoType extends DateType implements IMongoType {
     if (!valid) {
       throw new Error(msg)
     }
-    if (value === undefined && schema) {
-      return schema.default
-    } else {
-      return value
+    if (value === undefined) {
+      value = this.getDefaultValue(schema)
+      if (value === undefined) {
+        return undefined
+      }
     }
+    return value
   }
   public deserialize(value: any | undefined, schema: IJsSchema) {
-    if (!(value instanceof Date)) {
-      throw new Error(`Invalid date value: ${value}`)
-    }
-    if (value === undefined && schema) {
-      return schema.default
+    if (value === undefined) {
+      return this.getDefaultValue(schema)
     } else {
+      if (!(value instanceof Date)) {
+        throw new Error(`Invalid date value: ${value}`)
+      }
       return value
     }
   }
