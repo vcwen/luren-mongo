@@ -15,7 +15,7 @@ defineJsSchema(ObjectID, objectIdSchema)
 export class ObjectIdType implements IJsType {
   public type: string = 'file'
   public toJsonSchema() {
-    return { type: 'objectId' }
+    return { type: 'string' }
   }
   public validate(val: any): [boolean, string] {
     if (val === undefined || ObjectId.isValid(val)) {
