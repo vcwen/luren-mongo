@@ -144,6 +144,9 @@ export class IntegerMongoType extends IntegerType implements IMongoType {
 // tslint:disable-next-line: max-classes-per-file
 export class DateMongoType extends DateType implements IMongoType {
   public validate(value: any): [boolean, string?] {
+    if (value === undefined) {
+      return [true]
+    }
     if (value instanceof Date) {
       return [true]
     } else {
