@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.0.25"></a>
+## [0.0.25](https://github.com/vcwen/luren-mongo/compare/v0.0.24...v0.0.25) (2019-08-16)
+
+
+### Bug Fixes
+
+* **MongoType.ts:** fix date type ([470adf3](https://github.com/vcwen/luren-mongo/commit/470adf3))
+
+
+
 <a name="0.0.24"></a>
 ## [0.0.24](https://github.com/vcwen/luren-mongo/compare/v0.0.23...v0.0.24) (2019-08-16)
 
