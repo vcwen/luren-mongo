@@ -143,6 +143,9 @@ export class DateMongoType extends DateType implements IMongoType {
     bsonSchema.bsonType = 'date'
     return bsonSchema
   }
+  public toJsonSchema(_1: IJsSchema): IJsonSchema {
+    return { type: 'object' }
+  }
 }
 
 // tslint:disable-next-line: max-classes-per-file
@@ -201,7 +204,7 @@ export class ObjectMongoType extends ObjectType implements IMongoType {
 export class ObjectIdMongoType extends JsType implements IMongoType {
   public type: string = 'file'
   public toJsonSchema() {
-    return { type: 'string' }
+    return { type: 'object' }
   }
   public toBsonSchema() {
     return { bsonType: 'objectId' }
