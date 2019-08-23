@@ -367,10 +367,10 @@
   resolved "https://registry.npm.taobao.org/@types/lodash/download/@types/lodash-4.14.133.tgz#430721c96da22dd1694443e68e6cec7ba1c1003d"
   integrity sha1-QwchyW2iLdFpREPmjmzse6HBAD0=
 
-"@types/mongodb@^3.1.27":
-  version "3.1.27"
-  resolved "https://registry.npm.taobao.org/@types/mongodb/download/@types/mongodb-3.1.27.tgz#989a9815f33f2be601a08b982479a36e139539b6"
-  integrity sha1-mJqYFfM/K+YBoIuYJHmjbhOVObY=
+"@types/mongodb@^3.3.0":
+  version "3.3.0"
+  resolved "https://registry.npm.taobao.org/@types/mongodb/download/@types/mongodb-3.3.0.tgz#f9e24b211e7cf8d3a6c51793f3f3e0234cd4d9b7"
+  integrity sha1-+eJLIR58+NOmxReT8/PgI0zU2bc=
   dependencies:
     "@types/bson" "*"
     "@types/node" "*"
@@ -2603,10 +2603,10 @@ lru-cache@^5.1.1:
   dependencies:
     yallist "^3.0.2"
 
-luren-schema@^0.0.36:
-  version "0.0.36"
-  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.0.36.tgz#7dd04caaa3ed5e4c989408a8c4d7124109930fa2"
-  integrity sha1-fdBMqqPtXkyYlAioxNcSQQmTD6I=
+luren-schema@^0.0.47:
+  version "0.0.47"
+  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.0.47.tgz#179809ee68b6310591d62227c8810aac704db2de"
+  integrity sha1-F5gJ7mi2MQWR1iInyIEKrHBNst4=
   dependencies:
     ajv "^6.10.2"
     immutable "^4.0.0-rc.12"
@@ -2614,10 +2614,10 @@ luren-schema@^0.0.36:
     luxon "^1.17.2"
     reflect-metadata "^0.1.13"
 
-luren@^0.0.36:
-  version "0.0.36"
-  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.36.tgz?cache=0&sync_timestamp=1565853782706&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fluren%2Fdownload%2Fluren-0.0.36.tgz#fa696aaafece1c52c512f68b8373d9d8ed501c54"
-  integrity sha1-+mlqqv7OHFLFEvaLg3PZ2O1QHFQ=
+luren@^0.0.39:
+  version "0.0.39"
+  resolved "https://registry.npm.taobao.org/luren/download/luren-0.0.39.tgz#96a7e564c0bb5d328a031db077b78a3bff65fa37"
+  integrity sha1-lqflZMC7XTKKAx2wd7eKO/9l+jc=
   dependencies:
     ajv "^6.10.0"
     boom "^7.3.0"
