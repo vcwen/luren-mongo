@@ -16,12 +16,10 @@ export interface IMongoSchemaOptions {
 export class MongoSchemaMetadata {
   public name: string
   public schema: IJsSchema
-  public description?: string
   public examples?: object
-  constructor(name: string, schema: IJsSchema, desc?: string) {
+  constructor(name: string, schema: IJsSchema) {
     this.name = name
     this.schema = schema
-    this.description = desc
   }
 }
 
@@ -32,7 +30,7 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
     const name = _.get(options, 'name', constructor.name)
     const schema: IJsSchema = { type: 'object', classConstructor: constructor as any }
     const properties: { [prop: string]: IJsSchema } = {}
-    let required: string[] = []
+    const required: string[] = []
     if (options.additionalProps) {
       schema.additionalProperties = true
     }
@@ -41,7 +39,7 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
         Reflect.getMetadata(SchemaMetadataKey.PROPS, constructor.prototype) || Map()
       const ignoredProps: List<string> = Reflect.getMetadata(MetadataKey.IGNORED_PROPS, constructor.prototype) || List()
       for (const [prop, propMetadata] of propsMetadata) {
-        if (propMetadata.schema.virtual || ignoredProps.contains(prop)) {
+        if (ignoredProps.contains(prop)) {
           continue
         }
         if (propMetadata.required) {
@@ -54,21 +52,21 @@ export function MongoSchema(options?: IMongoSchemaOptions) {
       Reflect.getMetadata(MetadataKey.FIELDS, constructor.prototype) || Map()
     for (const [prop, fieldMetadata] of fieldsMetadata) {
       if (fieldMetadata.required) {
-        if (required.indexOf(prop) === -1) {
-          required.push(prop)
-        }
-      } else {
-        if (required.indexOf(prop) !== -1) {
-          required = required.filter((item) => item !== prop)
-        }
+        required.push(prop)
       }
       properties[prop] = fieldMetadata.schema
     }
 
-    schema.properties = properties
-    schema.required = required
-    const desc = options ? options.description : undefined
-    const metadata = new MongoSchemaMetadata(name, schema, desc)
+    if (!_.isEmpty(properties)) {
+      schema.properties = properties
+    }
+    if (!_.isEmpty(required)) {
+      schema.required = required
+    }
+    if (options.description) {
+      schema.description = options.description
+    }
+    const metadata = new MongoSchemaMetadata(name, schema)
     Reflect.defineMetadata(MetadataKey.MONGO_SCHEMA, metadata, constructor.prototype)
   }
 }

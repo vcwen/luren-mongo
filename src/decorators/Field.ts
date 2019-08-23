@@ -1,7 +1,8 @@
 import { List, Map } from 'immutable'
-import { IJsSchema, utils } from 'luren-schema'
+import { IJsSchema } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants'
+import { mongoConvertSimpleTypeToJsSchema } from '../lib/utils'
 export interface IFieldOptions {
   type?: any
   schema?: IJsSchema
@@ -12,8 +13,6 @@ export interface IFieldOptions {
 export class FieldMetadata {
   public schema: IJsSchema
   public required: boolean
-  public id: boolean = false
-  public generated: boolean = false // Id option
   constructor(schema: IJsSchema, required: boolean = true) {
     this.schema = schema
     this.required = required
@@ -28,7 +27,7 @@ export function Field(options?: IFieldOptions) {
     if (options.schema) {
       fieldSchema = options.schema
     } else if (options.type) {
-      const [schema, required] = utils.convertSimpleSchemaToJsSchema(options.type)
+      const [schema, required] = mongoConvertSimpleTypeToJsSchema(options.type)
       fieldSchema = schema
       if (typeof fieldRequired !== 'boolean') {
         fieldRequired = required

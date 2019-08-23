@@ -6,7 +6,7 @@ import { MetadataKey } from '../constants'
 import { Constructor } from '../types'
 export class IndexMetadata {
   public fields!: { [key: string]: 1 | -1 | string }
-  public options!: NativeIndexOptions
+  public options?: NativeIndexOptions
 }
 
 export interface IIndexOptions extends NativeIndexOptions {
@@ -16,12 +16,11 @@ export interface IIndexOptions extends NativeIndexOptions {
 
 export function Index(options?: IIndexOptions) {
   return (target: object, propertyKey: string) => {
-    if (options) {
+    if (options && !_.isEmpty(options)) {
       const indexMetadata = {} as IndexMetadata
       indexMetadata.fields = { [propertyKey]: options.spec || 1 }
-      if (!_.isEmpty(options)) {
-        indexMetadata.options = options
-      }
+      indexMetadata.options = options
+
       let indexes: List<IndexMetadata> = Reflect.getMetadata(MetadataKey.INDEX, target) || List()
       indexes = indexes.push(indexMetadata)
       Reflect.defineMetadata(MetadataKey.INDEX, indexes, target)
@@ -47,10 +46,9 @@ export function CompoundIndex(
   return (constructor: Constructor<any>) => {
     let indexes: List<IndexMetadata> = Reflect.getMetadata(MetadataKey.INDEX, constructor.prototype) || List()
     const indexMetadata: any = { fields }
-    if (!_.isEmpty(options)) {
+    if (options && !_.isEmpty(options)) {
       indexMetadata.options = options
     }
-
     indexes = indexes.push(indexMetadata)
     Reflect.defineMetadata(MetadataKey.INDEX, indexes, constructor.prototype)
   }

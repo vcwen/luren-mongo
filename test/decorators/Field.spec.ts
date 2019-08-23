@@ -1,12 +1,14 @@
-import { Map } from 'immutable'
+import { List, Map } from 'immutable'
 import 'reflect-metadata'
-import { Field, FieldMetadata, MetadataKey } from '../../src'
+import { Field, FieldMetadata, Id, MetadataKey, NotField } from '../../src'
 
 describe('Field', () => {
-  it('should define prop metadata', () => {
+  it('should define field metadata', () => {
     class TestController {
       @Field()
       public name!: string
+      @Field({ schema: { type: 'number' } })
+      public foo?: number
     }
     const ctrl = new TestController()
     const props: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, ctrl)
@@ -16,6 +18,10 @@ describe('Field', () => {
         schema: expect.objectContaining({ type: 'string' })
       })
     )
+    expect(props.get('foo')).toEqual({
+      required: true,
+      schema: { type: 'number' }
+    })
   })
 
   it('should return decorator function when schema options is set', () => {
@@ -33,5 +39,25 @@ describe('Field', () => {
         })
       })
     )
+  })
+})
+
+describe('Id', () => {
+  it('should do just like Field decorator', () => {
+    const target = {}
+    Id({ type: 'number', default: 1 })(target, 'foo')
+    const props: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, target)
+    expect(props.get('foo')).toEqual({
+      required: true,
+      schema: { type: 'number', default: 1 }
+    })
+  })
+})
+describe('NotField', () => {
+  it('should add ignored props', () => {
+    const target = {}
+    NotField()(target, 'foo')
+    const props: List<string> = Reflect.getMetadata(MetadataKey.IGNORED_PROPS, target)
+    expect(props.toArray()).toEqual(['foo'])
   })
 })
