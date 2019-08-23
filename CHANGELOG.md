@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+<a name="0.0.28"></a>
+## [0.0.28](https://github.com/vcwen/luren-mongo/compare/v0.0.27...v0.0.28) (2019-08-23)
+
+
+### Bug Fixes
+
+* **MongoType:** Date & ObjectId to json schema as type 'object' ([753566a](https://github.com/vcwen/luren-mongo/commit/753566a))
+
+
+
 <a name="0.0.27"></a>
 ## [0.0.27](https://github.com/vcwen/luren-mongo/compare/v0.0.26...v0.0.27) (2019-08-23)
 
