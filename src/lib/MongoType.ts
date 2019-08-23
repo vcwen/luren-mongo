@@ -201,7 +201,7 @@ export class ObjectMongoType extends ObjectType implements IMongoType {
 export class ObjectIdMongoType extends JsType implements IMongoType {
   public type: string = 'file'
   public toJsonSchema() {
-    return { type: 'objectId' }
+    return { type: 'string' }
   }
   public toBsonSchema() {
     return { bsonType: 'objectId' }
