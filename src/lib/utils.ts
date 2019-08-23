@@ -1,10 +1,9 @@
 import Debug from 'debug'
 import _ from 'lodash'
-import { IJsSchema, IJsTypeOptions } from 'luren-schema'
+import { IJsSchema, utils } from 'luren-schema'
 import { MetadataKey } from '../constants'
 import { MongoSchemaMetadata } from '../decorators/MongoSchema'
 import { Constructor } from '../types'
-import { MongoDataTypes } from './MongoDataTypes'
 
 const debugLog = Debug('luren-mongo')
 
@@ -25,22 +24,17 @@ export const debug = (msg: string, ...params: any[]) => {
   debugLog(msg, ...params)
 }
 
-export const mongoValidate = (data: any, schema: IJsSchema, options?: IJsTypeOptions): [boolean, string?] => {
-  const mongoType = MongoDataTypes.get(schema.type)
-  return mongoType.validate(data, schema, options)
-}
-
-export const mongoSerialize = (data: any, schema: IJsSchema, options?: IJsTypeOptions) => {
-  const mongoType = MongoDataTypes.get(schema.type)
-  const [valid, msg] = mongoType.validate(data, schema, options)
-  if (!valid) {
-    throw new Error(msg)
+const mongoPreprocessor = (simpleSchema: any) => {
+  if (typeof simpleSchema === 'function') {
+    const schemaMetadata: MongoSchemaMetadata | undefined = Reflect.getMetadata(
+      MetadataKey.MONGO_SCHEMA,
+      simpleSchema.prototype
+    )
+    if (schemaMetadata) {
+      return schemaMetadata.schema
+    }
   }
-  return mongoType.serialize(data, schema)
 }
-
-export const mongoDeserialize = (json: any, schema: IJsSchema, options?: IJsTypeOptions) => {
-  const mongoType = MongoDataTypes.get(schema.type)
-  const data = mongoType.deserialize(json, schema, options)
-  return data
+export const mongoConvertSimpleTypeToJsSchema = (simpleSchema: any) => {
+  return utils.convertSimpleSchemaToJsSchema(simpleSchema, mongoPreprocessor)
 }

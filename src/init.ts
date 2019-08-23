@@ -1,4 +1,4 @@
-import { DataTypes, IJsSchema, IJsType } from 'luren-schema'
+import { IJsSchema, JsType, JsTypes } from 'luren-schema'
 import { defineJsSchema } from 'luren-schema/dist/lib/utils'
 import { ObjectId, ObjectID } from 'mongodb'
 import { defineMongoSchema } from './lib/utils'
@@ -12,7 +12,7 @@ defineJsSchema(ObjectId, objectIdSchema)
 defineJsSchema(ObjectID, objectIdSchema)
 
 // tslint:disable-next-line: max-classes-per-file
-export class ObjectIdType implements IJsType {
+export class ObjectIdType extends JsType {
   public type: string = 'file'
   public toJsonSchema() {
     return { type: 'string' }
@@ -45,4 +45,4 @@ export class ObjectIdType implements IJsType {
     return new ObjectId(value)
   }
 }
-DataTypes.register('objectId', new ObjectIdType())
+JsTypes.register('objectId', new ObjectIdType(JsTypes))
