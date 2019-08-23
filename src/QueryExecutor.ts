@@ -1,6 +1,6 @@
 import _ from 'lodash'
 import { LurenQueryExecutor } from 'luren'
-import { IJsSchema, utils } from 'luren-schema'
+import { IJsSchema } from 'luren-schema'
 import {
   ChangeStreamOptions,
   ClientSession,
@@ -13,9 +13,7 @@ import {
   CollectionReduceFunction,
   CommonOptions,
   FilterQuery,
-  FindOneAndDeleteOption,
-  FindOneAndReplaceOption,
-  FindOneAndUpdateOption,
+  FindAndModifyWriteOpResultObject,
   GeoHaystackSearchOptions,
   IndexOptions,
   IndexSpecification,
@@ -35,23 +33,33 @@ import { DataSource } from './DataSource'
 import { CollectionMetadata } from './decorators/Collection'
 import { MongoSchemaMetadata } from './decorators/MongoSchema'
 import { RelationMetadata } from './decorators/Relation'
-import { debug, mongoDeserialize, mongoSerialize } from './lib/utils'
-import { Constructor, IFindOptions } from './types'
+import MongoTypes from './lib/MongoTypes'
+import { debug, mongoConvertSimpleTypeToJsSchema } from './lib/utils'
+import {
+  Constructor,
+  IDeserializeOptions,
+  IFindOneAndDeleteOptions,
+  IFindOneAndReplaceOptions,
+  IFindOneAndUpdateOptions,
+  IFindOptions
+} from './types'
 
-const deserializeDocument = <T = any>(doc: any, defaultSchema: IJsSchema, options?: IFindOptions<T>) => {
-  if (options && options.deserialize === false) {
+const deserializeDocument = (doc: any, options?: IDeserializeOptions, defaultSchema?: IJsSchema) => {
+  options = options || {}
+  if (options.deserialize === false) {
     return doc
   }
   let schema = defaultSchema
-  if (options) {
-    if (options.schema) {
-      schema = options.schema
-    }
-    if (options.type) {
-      ;[schema] = utils.convertSimpleSchemaToJsSchema(options.type)
-    }
+  if (options.schema) {
+    schema = options.schema
+  } else if (options.type) {
+    ;[schema] = mongoConvertSimpleTypeToJsSchema(options.type)
   }
-  return mongoDeserialize(doc, schema)
+  if (schema) {
+    return MongoTypes.deserialize(doc, schema)
+  } else {
+    return doc
+  }
 }
 
 const join = (relation: RelationMetadata, prop: string) => {
@@ -87,12 +95,12 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     this._dataSource = dataSource
   }
   public async insertOne(obj: T, options?: CollectionInsertOneOptions) {
-    const doc = mongoSerialize(obj, this._schema)
+    const doc = MongoTypes.serialize(obj, this._schema)
     debug(`${this._collection.collectionName}.insertOne(%o)`, doc)
     return this._collection.insertOne(doc, options)
   }
   public async insertMany(objects: T[], options?: CollectionInsertManyOptions) {
-    const docs = objects.map((item) => mongoSerialize(item, this._schema))
+    const docs = objects.map((item) => MongoTypes.serialize(item, this._schema))
     debug(`${this._collection.collectionName}.insertOne(%o, %o)`, docs, options)
     return this._collection.insertMany(docs, options)
   }
@@ -117,7 +125,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
       debug(`${this._collection.collectionName}.aggregate(%o)`, pipeline)
       const res = await this._collection.aggregate(pipeline).toArray()
       if (res.length > 0) {
-        return deserializeDocument(res[0], this._schema, options)
+        return deserializeDocument(res[0], options, this._schema)
       } else {
         return undefined
       }
@@ -125,7 +133,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
       debug(`${this._collection.collectionName}.findOne(%o, %o)`, filter, options)
       const res = await this._collection.findOne(filter, options)
       if (res) {
-        const obj = deserializeDocument(res, this._schema, options)
+        const obj = deserializeDocument(res, options, this._schema)
         return obj
       } else {
         return undefined
@@ -152,11 +160,11 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
       }
       debug(`${this._collection.collectionName}.aggregate(%o)`, pipeline)
       const res = await this._collection.aggregate(pipeline).toArray()
-      return res.map((item) => deserializeDocument(item, this._schema, options))
+      return res.map((item) => deserializeDocument(item, options, this._schema))
     } else {
       debug(`${this._collection.collectionName}.find(%o, %o)`, filter, options)
       const res = await this._collection.find(filter, options).toArray()
-      return res.map((item) => deserializeDocument(item, this._schema, options))
+      return res.map((item) => deserializeDocument(item, options, this._schema))
     }
   }
   public async updateOne(filter: FilterQuery<T>, update: UpdateQuery<T>, options?: UpdateOneOptions) {
@@ -172,14 +180,31 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   public async deleteMany(filter: FilterQuery<T>, options?: CommonOptions) {
     return this._collection.deleteMany(filter, options)
   }
-  public async findOneAndDelete(filter: FilterQuery<T>, options?: FindOneAndDeleteOption) {
-    return this._collection.findOneAndDelete(filter, options)
+  public async findOneAndDelete<TSchema = T>(
+    filter: FilterQuery<T>,
+    options?: IFindOneAndDeleteOptions
+  ): Promise<FindAndModifyWriteOpResultObject<TSchema>> {
+    const res = await this._collection.findOneAndDelete(filter, options)
+    res.value = deserializeDocument(res.value, options, this._schema)
+    return res as any
   }
-  public async findOneAndReplace(filter: FilterQuery<T>, replacement: object, options?: FindOneAndReplaceOption) {
-    return this._collection.findOneAndReplace(filter, replacement, options)
+  public async findOneAndReplace<TSchema = T>(
+    filter: FilterQuery<T>,
+    replacement: object,
+    options?: IFindOneAndReplaceOptions
+  ): Promise<FindAndModifyWriteOpResultObject<TSchema>> {
+    const res = await this._collection.findOneAndReplace(filter, replacement, options)
+    res.value = deserializeDocument(res.value, options, this._schema)
+    return res as any
   }
-  public async findOneAndUpdate(filter: FilterQuery<T>, update: UpdateQuery<T>, options?: FindOneAndUpdateOption) {
-    return this._collection.findOneAndUpdate(filter, update, options)
+  public async findOneAndUpdate<TSchema = T>(
+    filter: FilterQuery<T>,
+    update: UpdateQuery<T>,
+    options?: IFindOneAndUpdateOptions
+  ): Promise<FindAndModifyWriteOpResultObject<TSchema>> {
+    const res = await this._collection.findOneAndUpdate(filter, update, options)
+    res.value = deserializeDocument(res.value, options, this._schema)
+    return res as any
   }
   public async aggregate<TSchema = any>(
     pipeline?: object[],
