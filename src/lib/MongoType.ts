@@ -96,8 +96,18 @@ export class NumberMongoType extends NumberType implements IMongoType {
 export class IntegerMongoType extends IntegerType implements IMongoType {
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema = this.toJsonSchema(schema)
-    Reflect.deleteProperty(bsonSchema, 'long')
-    bsonSchema.bsonType = 'number'
+    Reflect.deleteProperty(bsonSchema, 'type')
+    bsonSchema.bsonType = 'int'
+    return bsonSchema
+  }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class LongMongoType extends IntegerType implements IMongoType {
+  public toBsonSchema(schema: IJsSchema) {
+    const bsonSchema = this.toJsonSchema(schema)
+    Reflect.deleteProperty(bsonSchema, 'type')
+    bsonSchema.bsonType = 'long'
     return bsonSchema
   }
 }
