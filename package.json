@@ -7,10 +7,11 @@
   "author": "Vincent Wen <wenwei1202@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "@types/mongodb": "^3.5.2",
     "debug": "^4.1.1",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.11",
-    "mongodb": "^3.1.13",
+    "mongodb": "^3.5.5",
     "reflect-metadata": "^0.1.13"
   },
   "peerDependencies": {
@@ -20,12 +21,13 @@
     "@types/debug": "^4.1.4",
     "@types/jest": "^24.0.17",
     "@types/lodash": "^4.14.123",
-    "@types/mongodb": "^3.3.0",
-    "jest": "^24.8.0",
-    "luren": "^0.0.39",
+    "jest": "^25.1.0",
     "luren-schema": "^0.0.47",
-    "ts-jest": "^24.0.2",
+    "mongodb-memory-server": "^6.4.1",
+    "mongodb-memory-server-core": "^6.4.1",
+    "ts-jest": "^25.2.1",
+    "ts-node": "^8.7.0",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.5.3"
+    "typescript": "^3.8.3"
   }
 }
