@@ -1,5 +1,4 @@
 import _ from 'lodash'
-import { LurenQueryExecutor } from 'luren'
 import { IJsSchema } from 'luren-schema'
 import {
   ChangeStreamOptions,
@@ -20,7 +19,7 @@ import {
   MapReduceOptions,
   MongoCountPreferences,
   ParallelCollectionScanOptions,
-  ReadPreference,
+  ReadPreferenceOrMode,
   ReplaceOneOptions,
   Timestamp,
   UpdateManyOptions,
@@ -44,6 +43,19 @@ import {
   IFindOptions
 } from './types'
 
+// tslint:disable-next-line: no-empty-interface
+export interface IQueryExecutor {}
+
+export abstract class BaseQueryExecutor<T extends object> implements IQueryExecutor {
+  protected _schema: IJsSchema
+  protected _modelConstructor: Constructor<T>
+  constructor(model: Constructor<T>) {
+    this._modelConstructor = model
+    this._schema = this.loadSchema(model)
+  }
+  protected abstract loadSchema(model: Constructor<T>): IJsSchema
+}
+
 const deserializeDocument = (doc: any, options?: IDeserializeOptions, defaultSchema?: IJsSchema) => {
   options = options || {}
   if (options.deserialize === false) {
@@ -62,7 +74,7 @@ const deserializeDocument = (doc: any, options?: IDeserializeOptions, defaultSch
   }
 }
 
-const join = (relation: RelationMetadata, prop: string) => {
+const lookup = (relation: RelationMetadata, prop: string) => {
   const collection: CollectionMetadata | undefined = Reflect.getOwnMetadata(
     MetadataKey.COLLECTION,
     relation.target.prototype
@@ -71,7 +83,7 @@ const join = (relation: RelationMetadata, prop: string) => {
     throw new Error(`Target:${relation.target.name} is not an valid collection`)
   }
   const pipeline: any[] = []
-  const lookup = {
+  const lookupOp = {
     $lookup: {
       from: relation.target.name,
       localField: relation.localField,
@@ -79,20 +91,24 @@ const join = (relation: RelationMetadata, prop: string) => {
       as: prop
     }
   }
-  pipeline.push(lookup)
+  pipeline.push(lookupOp)
   if (relation.type === RelationType.ONE_TO_ONE) {
     pipeline.push({ $unwind: '$' + prop })
   }
   return pipeline
 }
 
-export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
+// tslint:disable-next-line: max-classes-per-file
+export class QueryExecutor<T extends object> extends BaseQueryExecutor<T> {
   protected _dataSource: DataSource
   private _collection!: Collection<T>
   constructor(model: Constructor<T>, collection: Collection<any>, dataSource: DataSource) {
     super(model)
     this._collection = collection
     this._dataSource = dataSource
+  }
+  public async getClient() {
+    return this._dataSource.getClient()
   }
   public async insertOne(obj: T, options?: CollectionInsertOneOptions) {
     const doc = MongoTypes.serialize(obj, this._schema)
@@ -119,7 +135,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
         if (!relation) {
           throw new Error(`No relation for property: ${prop} of ${this._modelConstructor.name}`)
         }
-        const lookupPipeline = join(relation, prop as string)
+        const lookupPipeline = lookup(relation, prop as string)
         pipeline.push(...lookupPipeline)
       }
       debug(`${this._collection.collectionName}.aggregate(%o)`, pipeline)
@@ -155,7 +171,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
         if (!relation) {
           throw new Error(`No relation for property: ${prop} of ${this._modelConstructor.name}`)
         }
-        const lookupPipeline = join(relation, prop as string)
+        const lookupPipeline = lookup(relation, prop as string)
         pipeline.push(...lookupPipeline)
       }
       debug(`${this._collection.collectionName}.aggregate(%o)`, pipeline)
@@ -228,7 +244,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   public distinct(
     key: string,
     query: FilterQuery<T>,
-    options?: { readPreference?: ReadPreference | string; maxTimeMS?: number; session?: ClientSession }
+    options?: { readPreference?: ReadPreferenceOrMode; maxTimeMS?: number; session?: ClientSession }
   ) {
     return this._collection.distinct(key, query, options)
   }
@@ -267,7 +283,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
   }
   public async listIndexes(options?: {
     batchSize?: number
-    readPreference?: ReadPreference | string
+    readPreference?: ReadPreferenceOrMode
     session?: ClientSession
   }) {
     return this._collection.listIndexes(options)
@@ -311,7 +327,7 @@ export class QueryExecutor<T extends object> extends LurenQueryExecutor<T> {
     if (mongoSchema) {
       return mongoSchema.schema
     } else {
-      throw new Error(`No mongo schema for:${model.name}`)
+      throw new Error(`No mongo schema defined for:${model.name}`)
     }
   }
 }

@@ -3,6 +3,8 @@ import _ from 'lodash'
 import { IJsSchema, MetadataKey as SchemaMetadataKey, PropMetadata } from 'luren-schema'
 import 'reflect-metadata'
 import { MetadataKey } from '../constants'
+import { Constructor } from '../types'
+import { CollectionMetadata } from './Collection'
 import { FieldMetadata } from './Field'
 
 export interface IMongoSchemaOptions {
@@ -10,13 +12,11 @@ export interface IMongoSchemaOptions {
   useJsSchema?: boolean
   additionalProps?: boolean
   description?: string
-  examples?: object
 }
 
 export class MongoSchemaMetadata {
   public name: string
   public schema: IJsSchema
-  public examples?: object
   constructor(name: string, schema: IJsSchema) {
     this.name = name
     this.schema = schema
@@ -24,8 +24,14 @@ export class MongoSchemaMetadata {
 }
 
 export function MongoSchema(options?: IMongoSchemaOptions) {
-  // tslint:disable-next-line: ban-types
-  return (constructor: Function) => {
+  return (constructor: Constructor) => {
+    const collectionMetadata: CollectionMetadata | undefined = Reflect.getOwnMetadata(
+      MetadataKey.COLLECTION,
+      constructor.prototype
+    )
+    if (collectionMetadata) {
+      throw new Error('Can not define decorators MongoSchema and Collection both in one model.')
+    }
     options = options || {}
     const name = _.get(options, 'name', constructor.name)
     const schema: IJsSchema = { type: 'object', classConstructor: constructor as any }

@@ -212,7 +212,7 @@ export class ObjectMongoType extends ObjectType implements IMongoType {
 
 // tslint:disable-next-line: max-classes-per-file
 export class ObjectIdMongoType extends JsType implements IMongoType {
-  public type: string = 'file'
+  public type: string = 'object'
   public toJsonSchema() {
     return { type: 'object' }
   }

@@ -7,11 +7,11 @@ import { Constructor } from '../types'
 
 const debugLog = Debug('luren-mongo')
 
-const regex = /\/(\w+)(\?.*)?$/
+const regex = /^mongodb:\/\/(.+)\/(.+?)(\?.*)?$/
 export const getDatabase = (connectUri: string) => {
   const match = regex.exec(connectUri)
   if (match) {
-    return match[1]
+    return match[2]
   }
 }
 
@@ -37,4 +37,8 @@ const mongoPreprocessor = (simpleSchema: any) => {
 }
 export const mongoConvertSimpleTypeToJsSchema = (simpleSchema: any) => {
   return utils.convertSimpleSchemaToJsSchema(simpleSchema, mongoPreprocessor)
+}
+
+export const deleteProperties = (target: object, props: string[]) => {
+  props.forEach((prop) => Reflect.deleteProperty(target, prop))
 }
