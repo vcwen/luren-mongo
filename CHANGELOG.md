@@ -1,6 +1,13 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
+### [0.0.29](https://github.com/vcwen/luren-mongo/compare/v0.0.28...v0.0.29) (2020-03-31)
+
+
+### Features
+
+* **mongotype:** add int and long type in mongodb ([a824da1](https://github.com/vcwen/luren-mongo/commit/a824da17981627a9351c7ce6b8cb8f4ce42c390c))
 
 <a name="0.0.28"></a>
 ## [0.0.28](https://github.com/vcwen/luren-mongo/compare/v0.0.27...v0.0.28) (2019-08-23)
