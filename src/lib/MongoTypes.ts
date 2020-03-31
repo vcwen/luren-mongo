@@ -22,15 +22,15 @@ export class MongoDataTypes extends DataTypes<MongoType> {
 }
 
 export const MongoTypes = new MongoDataTypes()
-MongoTypes.register('any', new AnyMongoType(MongoTypes))
-MongoTypes.register('string', new StringMongoType(MongoTypes))
-MongoTypes.register('boolean', new BooleanMongoType(MongoTypes))
-MongoTypes.register('integer', new IntegerMongoType(MongoTypes))
-MongoTypes.register('long', new LongMongoType(MongoTypes))
-MongoTypes.register('number', new NumberMongoType(MongoTypes))
-MongoTypes.register('date', new DateMongoType(MongoTypes))
+MongoTypes.register('any', new AnyMongoType())
+MongoTypes.register('string', new StringMongoType())
+MongoTypes.register('boolean', new BooleanMongoType())
+MongoTypes.register('integer', new IntegerMongoType())
+MongoTypes.register('long', new LongMongoType())
+MongoTypes.register('number', new NumberMongoType())
+MongoTypes.register('date', new DateMongoType())
 MongoTypes.register('array', new ArrayMongoType(MongoTypes))
 MongoTypes.register('object', new ObjectMongoType(MongoTypes))
-MongoTypes.register('objectId', new ObjectIdMongoType(MongoTypes))
+MongoTypes.register('objectId', new ObjectIdMongoType())
 
 export default MongoTypes

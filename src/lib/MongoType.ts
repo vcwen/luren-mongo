@@ -9,10 +9,13 @@ import {
   IJsSchema,
   IJsType,
   IntegerType,
+  IValidationResult,
   JsType,
   NumberType,
   ObjectType,
-  StringType
+  StringType,
+  ValidationError,
+  ValidationResult
 } from 'luren-schema'
 import { copyProperties } from 'luren-schema/dist/lib/utils'
 import { ObjectId } from 'mongodb'
@@ -114,26 +117,23 @@ export class LongMongoType extends IntegerType implements IMongoType {
 
 // tslint:disable-next-line: max-classes-per-file
 export class DateMongoType extends DateType implements IMongoType {
-  public validate(value: any): [boolean, string?] {
+  public validate(value: any): IValidationResult {
     if (value === undefined) {
-      return [true]
+      return new ValidationResult(true)
     }
     if (value instanceof Date) {
-      return [true]
+      return new ValidationResult(true)
     } else {
-      return [false, `invalid date value: ${value}`]
+      return new ValidationResult(false, new ValidationError(`invalid date value: ${value}`))
     }
   }
   public serialize(value: any | undefined, schema: IJsSchema) {
-    const [valid, msg] = this.validate(value)
-    if (!valid) {
-      throw new Error(msg)
+    const res = this.validate(value)
+    if (!res.valid) {
+      throw res.error
     }
     if (value === undefined) {
       value = this.getDefaultValue(schema)
-      if (value === undefined) {
-        return undefined
-      }
     }
     return value
   }
@@ -219,20 +219,20 @@ export class ObjectIdMongoType extends JsType implements IMongoType {
   public toBsonSchema() {
     return { bsonType: 'objectId' }
   }
-  public validate(val: any): [boolean, string] {
+  public validate(val: any): IValidationResult {
     if (val === undefined || ObjectId.isValid(val)) {
-      return [true, '']
+      return new ValidationResult(true)
     } else {
-      return [false, `Invalid ObjectId: ${val}`]
+      return new ValidationResult(false, new ValidationError(`Invalid ObjectId: ${val}`))
     }
   }
   public serialize(value: ObjectId | undefined, schema: IJsSchema) {
     if (value === undefined) {
       return schema.default
     }
-    const [valid, msg] = this.validate(value)
-    if (!valid) {
-      throw new Error(msg)
+    const res = this.validate(value)
+    if (!res.valid) {
+      throw res.error
     }
     return new ObjectId(value)
   }
@@ -240,9 +240,9 @@ export class ObjectIdMongoType extends JsType implements IMongoType {
     if (value === undefined) {
       return schema.default
     }
-    const [valid, msg] = this.validate(value)
-    if (!valid) {
-      throw new Error(msg)
+    const res = this.validate(value)
+    if (!res.valid) {
+      throw res.error
     }
     return new ObjectId(value)
   }

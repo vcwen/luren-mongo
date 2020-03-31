@@ -1,9 +1,9 @@
-import { MongoTypes } from '../../src'
+import { AnyMongoType } from '../../src/lib/MongoType'
 
 describe('AnyMongoType', () => {
   describe('toBsonSchema', () => {
     it('should generate bson schema', () => {
-      const bsonSchema = MongoTypes.get('any').toBsonSchema({ type: 'any' })
+      const bsonSchema = new AnyMongoType().toBsonSchema({ type: 'any' })
       expect(bsonSchema).toEqual({})
     })
   })

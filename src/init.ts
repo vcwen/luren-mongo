@@ -1,4 +1,4 @@
-import { IJsSchema, JsType, JsTypes } from 'luren-schema'
+import { IJsSchema, IValidationResult, JsType, JsTypes, ValidationError, ValidationResult } from 'luren-schema'
 import { defineJsSchema } from 'luren-schema/dist/lib/utils'
 import { ObjectId, ObjectID } from 'mongodb'
 import { defineMongoSchema } from './lib/utils'
@@ -17,20 +17,20 @@ export class ObjectIdType extends JsType {
   public toJsonSchema() {
     return { type: 'string' }
   }
-  public validate(val: any): [boolean, string] {
+  public validate(val: any): IValidationResult {
     if (val === undefined || ObjectId.isValid(val)) {
-      return [true, '']
+      return new ValidationResult(true)
     } else {
-      return [false, `Invalid ObjectId: ${val}`]
+      return new ValidationResult(false, new ValidationError(`Invalid ObjectId: ${val}`))
     }
   }
   public serialize(value: ObjectId | undefined, schema: IJsSchema) {
     if (value === undefined) {
       return schema.default
     }
-    const [valid, msg] = this.validate(value)
-    if (!valid) {
-      throw new Error(msg)
+    const res = this.validate(value)
+    if (!res.valid) {
+      throw res.error
     }
     return new ObjectId(value).toHexString()
   }
@@ -38,11 +38,11 @@ export class ObjectIdType extends JsType {
     if (value === undefined) {
       return schema.default
     }
-    const [valid, msg] = this.validate(value)
-    if (!valid) {
-      throw new Error(msg)
+    const res = this.validate(value)
+    if (!res.valid) {
+      throw res.error
     }
     return new ObjectId(value)
   }
 }
-JsTypes.register('objectId', new ObjectIdType(JsTypes))
+JsTypes.register('objectId', new ObjectIdType())
