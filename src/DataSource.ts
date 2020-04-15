@@ -19,7 +19,7 @@ export interface IDatasource {
 
 export interface IMongoDataSourceOptions extends MongoClientOptions {
   database?: string
-  url?: string
+  uri?: string
   host?: string
   port?: number
   user?: string
@@ -40,7 +40,7 @@ export class DataSource implements IDatasource {
     if (options.user && options.password) {
       options.auth = { user: options.user, password: options.password }
     }
-    deleteProperties(options, ['url', 'host', 'port', 'database', 'user', 'password'])
+    deleteProperties(options, ['uri', 'host', 'port', 'database', 'user', 'password'])
     this._clientPromise = MongoClient.connect(this._connectUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
@@ -91,7 +91,7 @@ export class DataSource implements IDatasource {
     const db = client.db(dbName)
     const validationOptions = collectionMetadata.validationOptions
     let validation: { validator: object; validationLevel: string; validationAction: string } | undefined
-    let validationSyncStrategy: string = 'if_not_exists'
+    let validationSyncStrategy = ValidationSyncStrategy.IF_NOT_EXISTS
     if (validationOptions) {
       validation = {
         validator: { $jsonSchema: collectionMetadata.schema },
@@ -138,8 +138,8 @@ export class DataSource implements IDatasource {
     }
   }
   private _getConnectUri(options: IMongoDataSourceOptions) {
-    if (options.url) {
-      return options.url
+    if (options.uri) {
+      return options.uri
     } else {
       return `mongodb://${options.host ?? DEFAULT_HOST}:${options.port ?? DEFAULT_PORT}`
     }

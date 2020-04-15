@@ -1,2 +1,2 @@
 # luren-mongo
-Mongodb datasource for Luren
+Mongodb data source for Luren

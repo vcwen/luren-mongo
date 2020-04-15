@@ -10,13 +10,13 @@ import { MongoSchema, MongoSchemaMetadata } from './MongoSchema'
 export interface IValidatorOptions {
   validationLevel: 'off' | 'strict' | 'moderate'
   validationAction?: 'error' | 'warn'
-  syncStrategy: ValidationSyncStrategy
+  syncStrategy?: ValidationSyncStrategy
 }
 
 export interface ICollectionOptions {
   name?: string
   database?: string
-  datasource?: DataSource
+  dataSource?: DataSource
   useJsSchema?: boolean
   additionalProps?: boolean
   validationOptions?: IValidatorOptions
@@ -25,7 +25,7 @@ export interface ICollectionOptions {
 export class CollectionMetadata {
   public name!: string
   public database?: string
-  public datasource?: DataSource
+  public dataSource?: DataSource
   public validationOptions?: IValidatorOptions
   public schema?: IBsonSchema
 }
@@ -36,7 +36,7 @@ export function Collection(options?: ICollectionOptions) {
     metadata.name = _.get(options, 'name', constructor.name)
     options = options || {}
     metadata.database = options.database
-    metadata.datasource = options.datasource
+    metadata.dataSource = options.dataSource
     metadata.validationOptions = options.validationOptions
 
     let schemaMetadata: MongoSchemaMetadata | undefined = Reflect.getOwnMetadata(
@@ -54,8 +54,8 @@ export function Collection(options?: ICollectionOptions) {
     schemaMetadata = Reflect.getOwnMetadata(MetadataKey.MONGO_SCHEMA, constructor.prototype) as MongoSchemaMetadata
     metadata.schema = MongoTypes.toBsonSchema(schemaMetadata.schema)
     Reflect.defineMetadata(MetadataKey.COLLECTION, metadata, constructor.prototype)
-    if (metadata.datasource) {
-      metadata.datasource.register(constructor)
+    if (metadata.dataSource) {
+      metadata.dataSource.register(constructor)
     }
   }
 }
