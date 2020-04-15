@@ -1,7 +1,7 @@
 import _ from 'lodash'
 import { Constructor } from 'luren-schema/dist/types'
 import 'reflect-metadata'
-import { MetadataKey } from '../constants'
+import { MetadataKey, ValidationSyncStrategy } from '../constants'
 import { DataSource } from '../DataSource'
 import MongoTypes from '../lib/MongoTypes'
 import { IBsonSchema } from '../types'
@@ -10,6 +10,7 @@ import { MongoSchema, MongoSchemaMetadata } from './MongoSchema'
 export interface IValidatorOptions {
   validationLevel: 'off' | 'strict' | 'moderate'
   validationAction?: 'error' | 'warn'
+  syncStrategy: ValidationSyncStrategy
 }
 
 export interface ICollectionOptions {

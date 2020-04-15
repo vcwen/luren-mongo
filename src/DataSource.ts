@@ -1,6 +1,7 @@
 import { List, Map, Set } from 'immutable'
-import { MongoClient, MongoClientOptions } from 'mongodb'
-import { MetadataKey } from './constants'
+import _ from 'lodash'
+import { Collection, CollectionCreateOptions, MongoClient, MongoClientOptions } from 'mongodb'
+import { MetadataKey, ValidationSyncStrategy } from './constants'
 import { CollectionMetadata } from './decorators/Collection'
 import { IndexMetadata } from './decorators/Index'
 import { debug, deleteProperties } from './lib/utils'
@@ -24,28 +25,28 @@ export interface IMongoDataSourceOptions extends MongoClientOptions {
   user?: string
   password?: string
 }
-// tslint:disable-next-line: max-classes-per-file
+
 export class DataSource implements IDatasource {
   private _models: Set<Constructor> = Set()
-  private _connectUrl: string
+  private _connectUri: string
   private _clientPromise: Promise<MongoClient>
   private _queryExecutors: Map<string, QueryExecutor<any>> = Map()
   private _database?: string
   constructor(options?: IMongoDataSourceOptions) {
     options = { ...options }
-    this._connectUrl = this._getConnectUrl(options)
-    const database = options.database ?? getDatabase(this._connectUrl)
+    this._connectUri = this._getConnectUri(options)
+    const database = options.database ?? getDatabase(this._connectUri)
     this._database = database
     if (options.user && options.password) {
       options.auth = { user: options.user, password: options.password }
     }
     deleteProperties(options, ['url', 'host', 'port', 'database', 'user', 'password'])
-    this._clientPromise = MongoClient.connect(this._connectUrl, {
+    this._clientPromise = MongoClient.connect(this._connectUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       ...options
     }).then((client) => {
-      debug(`connected to ${this._connectUrl}`)
+      debug(`connected to ${this._connectUri}`)
       return client
     })
   }
@@ -88,30 +89,55 @@ export class DataSource implements IDatasource {
     }
     const client = await this.getClient()
     const db = client.db(dbName)
-    // ensure collection is created
-    const collection = await db.createCollection(collectionMetadata.name)
+    const validationOptions = collectionMetadata.validationOptions
+    let validation: { validator: object; validationLevel: string; validationAction: string } | undefined
+    let validationSyncStrategy: string = 'if_not_exists'
+    if (validationOptions) {
+      validation = {
+        validator: { $jsonSchema: collectionMetadata.schema },
+        validationLevel: validationOptions.validationLevel,
+        validationAction: validationOptions.validationAction ?? 'error' // default action: error
+      }
+      if (validationOptions.syncStrategy) {
+        validationSyncStrategy = validationOptions.syncStrategy
+      }
+    }
+    const existingCollectionsInfo = await db.listCollections({ name: collectionMetadata.name }).toArray()
+    const collectionInfo = _.head(existingCollectionsInfo)
+    let collection: Collection
+    if (!collectionInfo) {
+      const options: CollectionCreateOptions = {}
+      if (validationSyncStrategy !== 'never') {
+        Object.assign(options, validationOptions)
+      }
+      debug('create collection %s with options %o', collectionMetadata.name, options)
+      collection = await db.createCollection(collectionMetadata.name, options)
+    } else {
+      collection = db.collection(collectionMetadata.name)
+      if (validation && validationSyncStrategy !== ValidationSyncStrategy.NEVER) {
+        if (validationSyncStrategy === ValidationSyncStrategy.OVERRIDE || !collectionInfo.options?.validator) {
+          const command = {
+            collMod: collectionMetadata.name,
+            ...validation
+          }
+          debug('set validator %o', command)
+          await db.command(command)
+        }
+      }
+    }
     for (const metadata of indexMetadataList) {
       debug('create index %o with options %o', metadata.fields, metadata.options)
       collection.createIndex(metadata.fields, metadata.options)
-    }
-
-    if (collectionMetadata.validationOptions) {
-      const command = {
-        collMod: collectionMetadata.name,
-        validator: { $jsonSchema: collectionMetadata.schema },
-        validationLevel: collectionMetadata.validationOptions.validationLevel,
-        validationAction: collectionMetadata.validationOptions.validationAction ?? 'error' // default action: error
-      }
-      await db.command(command)
-      debug('set validator %j', command)
     }
     return true
   }
   public async disconnect() {
     const client = await this.getClient()
-    return client.close()
+    if (client.isConnected()) {
+      return client.close()
+    }
   }
-  private _getConnectUrl(options: IMongoDataSourceOptions) {
+  private _getConnectUri(options: IMongoDataSourceOptions) {
     if (options.url) {
       return options.url
     } else {

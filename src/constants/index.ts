@@ -20,3 +20,9 @@ export const enum Types {
   Array = 'array',
   Object = 'object'
 }
+
+export const enum ValidationSyncStrategy {
+  IF_NOT_EXISTS = 'if_not_exists',
+  OVERRIDE = 'override',
+  NEVER = 'never'
+}
