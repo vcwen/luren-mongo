@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.30](https://github.com/vcwen/luren-mongo/compare/v0.0.29...v0.0.30) (2020-04-15)
+
+
+### Features
+
+* **validation:** add valition sync strategy option ([cdcea6f](https://github.com/vcwen/luren-mongo/commit/cdcea6ff063a0e5c9543489dbf3b0d7fb983cb9a))
+
 ### [0.0.29](https://github.com/vcwen/luren-mongo/compare/v0.0.28...v0.0.29) (2020-03-31)
 
 
