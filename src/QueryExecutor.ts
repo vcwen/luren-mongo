@@ -24,7 +24,8 @@ import {
   Timestamp,
   UpdateManyOptions,
   UpdateOneOptions,
-  UpdateQuery
+  UpdateQuery,
+  BulkWriteOperation
 } from 'mongodb'
 import { RelationType } from './constants'
 import { MetadataKey } from './constants'
@@ -229,7 +230,7 @@ export class QueryExecutor<T extends object> extends BaseQueryExecutor<T> {
     const result = await this._collection.aggregate<TSchema>(pipeline, options).toArray()
     return result
   }
-  public async bulkWrite(operations: object[], options?: CollectionBulkWriteOptions) {
+  public async bulkWrite(operations: BulkWriteOperation<any>[], options?: CollectionBulkWriteOptions) {
     return this._collection.bulkWrite(operations, options)
   }
   public async countDocuments(query?: FilterQuery<T>, options?: MongoCountPreferences) {

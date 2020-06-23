@@ -1,11 +1,11 @@
-import { Map, Set } from 'immutable'
-// import { getDatabase } from '../src/lib/utils'
+import { Set } from 'immutable'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { QueryExecutor } from '../src'
 import { DataSource } from '../src/DataSource'
 import { Collection } from '../src/decorators/Collection'
 import { Field } from '../src/decorators/Field'
 import { Index } from '../src/decorators/Index'
+import { MongoClient } from 'mongodb'
 
 const TIMEOUT = 600000
 jasmine.DEFAULT_TIMEOUT_INTERVAL = TIMEOUT
@@ -30,7 +30,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (mongoServer) {
-    await mongoServer.stop()
+    mongoServer.stop()
   }
 })
 
@@ -40,61 +40,73 @@ afterEach(async () => {
   }
 })
 
+jest.mock('mongodb')
+
 describe('DataSource', () => {
   describe('constructor', () => {
     it('should create the instance with default options', async () => {
+      ;(MongoClient as any).disableMock = false
       dataSource = new DataSource({ database: 'luren' })
-      expect(dataSource).toEqual({
-        _clientPromise: expect.any(Promise),
-        _connectUri: 'mongodb://localhost:27017',
-        _database: 'luren',
-        _models: Set(),
-        _queryExecutors: Map()
-      })
+      dataSource.connect()
+      expect(dataSource).toEqual(
+        expect.objectContaining({
+          _connectUri: 'mongodb://localhost:27017',
+          _database: 'luren'
+        })
+      )
     })
     it('should create the instance with url', async () => {
-      dataSource = new DataSource({ uri: 'mongodb://localhost:27017/luren' })
-      expect(dataSource).toEqual({
-        _clientPromise: expect.any(Promise),
-        _connectUri: 'mongodb://localhost:27017/luren',
-        _database: 'luren',
-        _models: Set(),
-        _queryExecutors: Map()
-      })
+      ;(MongoClient as any).disableMock = false
+      dataSource = new DataSource({ uri: 'mongodb://localhost:27017/luren', autoConnect: true })
+      expect(dataSource).toEqual(
+        expect.objectContaining({
+          _connectUri: 'mongodb://localhost:27017/luren',
+          _database: 'luren'
+        })
+      )
     })
     it('should create the instance with host & port', async () => {
+      ;(MongoClient as any).disableMock = false
       dataSource = new DataSource({ host: 'localhost', port: 27017, database: 'luren' })
-      expect(dataSource).toEqual({
-        _clientPromise: expect.any(Promise),
-        _connectUri: 'mongodb://localhost:27017',
-        _database: 'luren',
-        _models: Set(),
-        _queryExecutors: Map()
-      })
+      dataSource.connect()
+      expect(dataSource).toEqual(
+        expect.objectContaining({
+          _connectUri: 'mongodb://localhost:27017',
+          _database: 'luren'
+        })
+      )
     })
     it('should set user & password for mongo auth', async () => {
+      ;(MongoClient as any).disableMock = false
       const dbName = 'luren' + Date.now()
-
       dataSource = new DataSource({ host: 'localhost', port: 27017, database: dbName, user: 'foo', password: 'bar' })
-      expect(dataSource).toEqual({
-        _clientPromise: expect.any(Promise),
-        _connectUri: 'mongodb://localhost:27017',
-        _database: dbName,
-        _models: Set(),
-        _queryExecutors: Map()
-      })
+      dataSource.connect()
+      expect(dataSource).toEqual(
+        expect.objectContaining({
+          _connectOptions: {
+            host: 'localhost',
+            port: 27017,
+            database: dbName,
+            user: 'foo',
+            password: 'bar'
+          }
+        })
+      )
     })
   })
   describe('register', () => {
     it('should register model', async () => {
+      ;(MongoClient as any).disableMock = true
       const uri = await mongoServer.getConnectionString()
       dataSource = new DataSource({ uri })
+      dataSource.connect()
       await dataSource.register(Person)
       expect(Reflect.get(dataSource, '_models')).toEqual(Set().add(Person))
     })
     it('should not be added again if model is already registered', async () => {
+      ;(MongoClient as any).disableMock = true
       const uri = await mongoServer.getConnectionString()
-      dataSource = new DataSource({ uri })
+      dataSource = new DataSource({ uri, autoConnect: true })
       const models = Reflect.get(dataSource, '_models')
       await dataSource.register(Person)
       const addFn = jest.fn()
@@ -104,6 +116,7 @@ describe('DataSource', () => {
       expect(addFn).toBeCalledTimes(0)
     })
     it('should not register model if no collection metadata is available', async () => {
+      ;(MongoClient as any).disableMock = true
       const uri = await mongoServer.getConnectionString()
       dataSource = new DataSource({ uri })
       // tslint:disable-next-line: max-classes-per-file
@@ -114,19 +127,25 @@ describe('DataSource', () => {
       expect(res).toBeFalsy()
     })
     it('should throw an error if model does not have collection info', async () => {
+      ;(MongoClient as any).disableMock = true
       dataSource = new DataSource()
+      dataSource.connect()
       expect(dataSource.register(Person)).rejects.toThrowError('No valid database for Person')
     })
   })
   describe('getQueryExecutor', () => {
     it('should return the query executor for the model', async () => {
+      ;(MongoClient as any).disableMock = true
       const uri = await mongoServer.getConnectionString()
       dataSource = new DataSource({ uri })
+      dataSource.connect()
       const qe = await dataSource.getQueryExecutor(Person)
       expect(qe).toBeInstanceOf(QueryExecutor)
     })
     it('should throw error if database is not known', async () => {
+      ;(MongoClient as any).disableMock = false
       dataSource = new DataSource()
+      dataSource.connect()
       // tslint:disable-next-line: max-classes-per-file
       class Foo {
         // empty class
@@ -134,7 +153,9 @@ describe('DataSource', () => {
       expect(dataSource.getQueryExecutor(Foo)).rejects.toThrow('class Foo has not been bound to a collection')
     })
     it('should throw error if database is not known', async () => {
+      ;(MongoClient as any).disableMock = false
       dataSource = new DataSource()
+      dataSource.connect()
       // tslint:disable-next-line: max-classes-per-file
       @Collection()
       class Bar {
