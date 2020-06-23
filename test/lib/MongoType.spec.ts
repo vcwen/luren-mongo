@@ -3,7 +3,7 @@ import { AnyMongoType } from '../../src/lib/MongoType'
 describe('AnyMongoType', () => {
   describe('toBsonSchema', () => {
     it('should generate bson schema', () => {
-      const bsonSchema = new AnyMongoType().toBsonSchema({ type: 'any' })
+      const bsonSchema = new AnyMongoType().toBsonSchema()
       expect(bsonSchema).toEqual({})
     })
   })

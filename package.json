@@ -7,27 +7,27 @@
   "author": "Vincent Wen <wenwei1202@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@types/mongodb": "^3.5.2",
+    "@types/mongodb": "^3.5.24",
     "debug": "^4.1.1",
     "immutable": "^4.0.0-rc.12",
-    "lodash": "^4.17.11",
-    "mongodb": "^3.5.5",
+    "lodash": "^4.17.15",
+    "mongodb": "^3.5.9",
     "reflect-metadata": "^0.1.13"
   },
   "peerDependencies": {
-    "luren-schema": "0.0.*"
+    "luren-schema": "0.2.*"
   },
   "devDependencies": {
     "@types/debug": "^4.1.4",
-    "@types/jest": "^24.0.17",
-    "@types/lodash": "^4.14.123",
-    "jest": "^25.1.0",
-    "luren-schema": "^0.1.5",
+    "@types/jest": "^26.0.0",
+    "@types/lodash": "^4.14.156",
+    "jest": "^26.1.0",
+    "luren-schema": "^0.2.2",
     "mongodb-memory-server": "^6.4.1",
     "mongodb-memory-server-core": "^6.4.1",
-    "ts-jest": "^25.2.1",
-    "ts-node": "^8.7.0",
+    "ts-jest": "^26.1.1",
+    "ts-node": "^8.10.2",
     "tslint-config-prettier": "^1.18.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.5"
   }
 }

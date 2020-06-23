@@ -12,7 +12,7 @@ import { Constructor } from './types'
 const DEFAULT_HOST = 'localhost'
 const DEFAULT_PORT = 27017
 
-export interface IDatasource {
+export interface IDataSource {
   getQueryExecutor<T extends object>(model: Constructor<T>): Promise<IQueryExecutor>
   register<T extends object>(model: Constructor<T>): Promise<boolean>
 }
@@ -24,28 +24,39 @@ export interface IMongoDataSourceOptions extends MongoClientOptions {
   port?: number
   user?: string
   password?: string
+  autoConnect?: boolean
 }
 
-export class DataSource implements IDatasource {
+export class DataSource implements IDataSource {
   private _models: Set<Constructor> = Set()
-  private _connectUri: string
-  private _clientPromise: Promise<MongoClient>
+  private _connectUri?: string
+  private _connectOptions?: IMongoDataSourceOptions
+  private _clientPromise?: Promise<MongoClient>
   private _queryExecutors: Map<string, QueryExecutor<any>> = Map()
   private _database?: string
   constructor(options?: IMongoDataSourceOptions) {
-    options = { ...options }
+    if (options) {
+      if (options.autoConnect) {
+        this.connect(options)
+      } else {
+        this._connectOptions = options
+      }
+    }
+  }
+  public async connect(options?: IMongoDataSourceOptions) {
+    options = Object.assign({}, options ?? this._connectOptions)
     this._connectUri = this._getConnectUri(options)
     const database = options.database ?? getDatabase(this._connectUri)
     this._database = database
     if (options.user && options.password) {
       options.auth = { user: options.user, password: options.password }
     }
-    deleteProperties(options, ['uri', 'host', 'port', 'database', 'user', 'password'])
+    deleteProperties(options, ['uri', 'host', 'port', 'database', 'user', 'password', 'autoConnect'])
     this._clientPromise = MongoClient.connect(this._connectUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       ...options
-    }).then((client) => {
+    } as MongoClientOptions).then((client) => {
       debug(`connected to ${this._connectUri}`)
       return client
     })
@@ -53,13 +64,20 @@ export class DataSource implements IDatasource {
   public async getClient() {
     return this._clientPromise
   }
+  public async getClientMust() {
+    if (this._clientPromise) {
+      return this._clientPromise
+    } else {
+      throw new Error('No client available, needs to connect to the database first')
+    }
+  }
   public async getQueryExecutor<T extends object>(model: Constructor<T>): Promise<QueryExecutor<T>> {
     const metadata: CollectionMetadata | undefined = Reflect.getOwnMetadata(MetadataKey.COLLECTION, model.prototype)
     if (!metadata) {
       throw new Error(`class ${model.name} has not been bound to a collection`)
     }
     if (!this._queryExecutors.has(metadata.name)) {
-      const client = await this.getClient()
+      const client = await this.getClientMust()
       const db = metadata.database || this._database
       if (!db) {
         throw new Error('database name is required')
@@ -87,7 +105,7 @@ export class DataSource implements IDatasource {
     if (!dbName) {
       throw new Error(`No valid database for ${model.name}`)
     }
-    const client = await this.getClient()
+    const client = await this.getClientMust()
     const db = client.db(dbName)
     const validationOptions = collectionMetadata.validationOptions
     let validation: { validator: object; validationLevel: string; validationAction: string } | undefined
@@ -133,7 +151,7 @@ export class DataSource implements IDatasource {
   }
   public async disconnect() {
     const client = await this.getClient()
-    if (client.isConnected()) {
+    if (client && client.isConnected()) {
       return client.close()
     }
   }

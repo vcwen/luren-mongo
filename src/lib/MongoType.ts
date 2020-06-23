@@ -1,21 +1,17 @@
 import _ from 'lodash'
 import {
-  AnyType,
   ArrayType,
-  BooleanType,
   DataTypes,
   DateType,
   IJsonSchema,
   IJsSchema,
   IJsType,
-  IntegerType,
   IValidationResult,
   JsType,
-  NumberType,
   ObjectType,
-  StringType,
   ValidationError,
-  ValidationResult
+  ValidationResult,
+  PrimitiveType
 } from 'luren-schema'
 import { copyProperties } from 'luren-schema/dist/lib/utils'
 import { ObjectId } from 'mongodb'
@@ -57,16 +53,51 @@ export abstract class MongoType extends JsType implements IMongoType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class AnyMongoType extends AnyType implements IMongoType {
-  public toBsonSchema(schema: IJsSchema) {
-    const bsonSchema = this.toJsonSchema(schema)
-    Reflect.deleteProperty(bsonSchema, 'type')
-    return bsonSchema
+export abstract class MongoPrimitiveType extends PrimitiveType implements IMongoType {
+  public abstract type: string
+  public abstract toBsonSchema(schema: IJsSchema, options?: IJsTypeOptions): IBsonSchema
+  public deserialize(value: any, schema: IJsSchema): any {
+    value = this.getExpectedValue(value, schema)
+    const res = this.validate(value, schema)
+    if (!res.valid) {
+      throw res.error
+    }
+    return value
+  }
+  public serialize(value: any | undefined, schema: IJsSchema): any {
+    value = this.getExpectedValue(value, schema)
+    const res = this.validate(value, schema)
+    if (!res.valid) {
+      throw res.error
+    }
+    if (value === undefined && schema) {
+      return schema.default
+    } else {
+      return value
+    }
   }
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class StringMongoType extends StringType implements IMongoType {
+export class AnyMongoType extends MongoPrimitiveType implements IMongoType {
+  public type: string = 'any'
+  public validate() {
+    return ValidationResult.ok()
+  }
+  public deserializationValidate() {
+    return ValidationResult.ok()
+  }
+  public toJsonSchema(): IJsonSchema {
+    return {}
+  }
+  public toBsonSchema() {
+    return {}
+  }
+}
+
+// tslint:disable-next-line: max-classes-per-file
+export class StringMongoType extends MongoPrimitiveType implements IMongoType {
+  public type: string = 'string'
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema = this.toJsonSchema(schema)
     Reflect.deleteProperty(bsonSchema, 'type')
@@ -76,7 +107,8 @@ export class StringMongoType extends StringType implements IMongoType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class BooleanMongoType extends BooleanType implements IMongoType {
+export class BooleanMongoType extends MongoPrimitiveType implements IMongoType {
+  public type: string = 'boolean'
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema = this.toJsonSchema(schema)
     Reflect.deleteProperty(bsonSchema, 'type')
@@ -86,7 +118,8 @@ export class BooleanMongoType extends BooleanType implements IMongoType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class NumberMongoType extends NumberType implements IMongoType {
+export class NumberMongoType extends MongoPrimitiveType implements IMongoType {
+  public type: string = 'number'
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema = this.toJsonSchema(schema)
     Reflect.deleteProperty(bsonSchema, 'type')
@@ -96,7 +129,8 @@ export class NumberMongoType extends NumberType implements IMongoType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class IntegerMongoType extends IntegerType implements IMongoType {
+export class IntegerMongoType extends MongoPrimitiveType implements IMongoType {
+  public type: string = 'integer'
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema = this.toJsonSchema(schema)
     Reflect.deleteProperty(bsonSchema, 'type')
@@ -106,7 +140,8 @@ export class IntegerMongoType extends IntegerType implements IMongoType {
 }
 
 // tslint:disable-next-line: max-classes-per-file
-export class LongMongoType extends IntegerType implements IMongoType {
+export class LongMongoType extends MongoPrimitiveType implements IMongoType {
+  public type: string = 'long'
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema = this.toJsonSchema(schema)
     Reflect.deleteProperty(bsonSchema, 'type')
@@ -118,34 +153,34 @@ export class LongMongoType extends IntegerType implements IMongoType {
 // tslint:disable-next-line: max-classes-per-file
 export class DateMongoType extends DateType implements IMongoType {
   public validate(value: any): IValidationResult {
-    if (value === undefined) {
-      return new ValidationResult(true)
-    }
     if (value instanceof Date) {
-      return new ValidationResult(true)
+      return ValidationResult.ok()
     } else {
-      return new ValidationResult(false, new ValidationError(`invalid date value: ${value}`))
+      return new ValidationResult(true, new ValidationError(`invalid date value: ${value}`))
     }
   }
-  public serialize(value: any | undefined, schema: IJsSchema) {
+  public serialize(value: any | undefined, schema: IJsSchema): Date {
+    value = this.getExpectedValue(value, schema)
     const res = this.validate(value)
     if (!res.valid) {
       throw res.error
     }
-    if (value === undefined) {
-      value = this.getDefaultValue(schema)
-    }
-    return value
+    return new Date(value)
   }
-  public deserialize(value: any | undefined, schema: IJsSchema) {
-    if (value === undefined) {
-      return this.getDefaultValue(schema)
+  public deserializationValidate(value: any) {
+    if (value instanceof Date) {
+      return ValidationResult.ok()
     } else {
-      if (!(value instanceof Date)) {
-        throw new Error(`Invalid date value: ${value}`)
-      }
-      return value
+      return new ValidationResult(true, new ValidationError(`invalid date value: ${value}`))
     }
+  }
+  public deserialize(value: any | undefined, schema: IJsSchema): Date {
+    value = this.getExpectedValue(value, schema)
+    const res = this.deserializationValidate(value)
+    if (!res.valid) {
+      throw res.error
+    }
+    return new Date(value)
   }
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema = this.toJsonSchema(schema)
@@ -153,83 +188,92 @@ export class DateMongoType extends DateType implements IMongoType {
     bsonSchema.bsonType = 'date'
     return bsonSchema
   }
-  public toJsonSchema(_1: IJsSchema): IJsonSchema {
-    return { type: 'object' }
-  }
 }
 
 // tslint:disable-next-line: max-classes-per-file
 export class ArrayMongoType extends ArrayType implements IMongoType {
-  protected dataTypes: DataTypes<MongoType>
-  constructor(dataTypes: DataTypes<MongoType>) {
+  constructor(dataTypes: DataTypes<IMongoType>) {
     super(dataTypes)
-    this.dataTypes = dataTypes
   }
   public toBsonSchema(schema: IJsSchema) {
-    const bsonSchema: IBsonSchema = { bsonType: 'array' }
+    const bsonSchema: IJsonSchema = { type: 'array' }
     const items = schema.items
-    let jsonItems: IJsonSchema | IJsonSchema[] | undefined
+    let bsonItems: IJsonSchema | IJsonSchema[] | undefined
     if (items) {
       if (Array.isArray(items)) {
-        jsonItems = items.map((item) => {
-          const mongoType = this.dataTypes.get(item.type)
+        bsonItems = items.map((item) => {
+          const mongoType = this.dataTypes.get(item.type) as IMongoType
           return mongoType.toBsonSchema(item)
         })
       } else {
-        const jsType = this.dataTypes.get(items.type)
-        jsonItems = jsType.toBsonSchema(items)
+        const mongoType = this.dataTypes.get(items.type) as IMongoType
+        bsonItems = mongoType.toBsonSchema(items)
       }
     }
-    if (jsonItems) {
-      bsonSchema.items = jsonItems
-    }
     copyProperties(bsonSchema, schema, OTHER_JSON_SCHEMA_PROPS)
+    if (bsonItems) {
+      bsonSchema.items = bsonItems
+    }
+    if (schema.default) {
+      bsonSchema.default = this.serialize(schema.default, schema)
+    }
     return bsonSchema
   }
 }
 // tslint:disable-next-line: max-classes-per-file
 export class ObjectMongoType extends ObjectType implements IMongoType {
-  protected dataTypes: DataTypes<MongoType>
-  constructor(dataTypes: DataTypes<MongoType>) {
-    super(dataTypes)
-    this.dataTypes = dataTypes
-  }
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema: IBsonSchema = { bsonType: 'object' }
+
     const properties = schema.properties
-    if (properties) {
+    if (!properties) {
+      return bsonSchema
+    }
+    const props = Object.getOwnPropertyNames(properties)
+    if (properties && !_.isEmpty(props)) {
       bsonSchema.properties = {}
-      for (const prop of Object.getOwnPropertyNames(properties)) {
+      for (const prop of props) {
         const propSchema = properties[prop]
-        const jsType = this.dataTypes.get(propSchema.type)
-        Reflect.set(bsonSchema.properties, prop, jsType.toBsonSchema(propSchema))
+        const mongoType = this.dataTypes.get(propSchema.type) as IMongoType
+        Reflect.set(bsonSchema.properties, prop, mongoType.toBsonSchema(propSchema))
       }
     }
+    if (schema.required) {
+      bsonSchema.required = schema.required
+    }
     copyProperties(bsonSchema, schema, OTHER_JSON_SCHEMA_PROPS)
+    if (schema.default) {
+      bsonSchema.default = this.serialize(schema.default, schema)
+    }
     return bsonSchema
   }
 }
 
 // tslint:disable-next-line: max-classes-per-file
 export class ObjectIdMongoType extends JsType implements IMongoType {
-  public type: string = 'object'
+  public type: string = 'objectId'
   public toJsonSchema() {
-    return { type: 'object' }
+    return { type: 'string' }
   }
   public toBsonSchema() {
     return { bsonType: 'objectId' }
   }
-  public validate(val: any): IValidationResult {
+  public deserializationValidate(val: any) {
     if (val === undefined || ObjectId.isValid(val)) {
-      return new ValidationResult(true)
+      return ValidationResult.ok()
     } else {
-      return new ValidationResult(false, new ValidationError(`Invalid ObjectId: ${val}`))
+      return ValidationResult.error(`Invalid ObjectId: ${val}`)
+    }
+  }
+  public validate(val: any) {
+    if (val === undefined || ObjectId.isValid(val)) {
+      return ValidationResult.ok()
+    } else {
+      return ValidationResult.error(`Invalid ObjectId: ${val}`)
     }
   }
   public serialize(value: ObjectId | undefined, schema: IJsSchema) {
-    if (value === undefined) {
-      return schema.default
-    }
+    value = this.getExpectedValue(value, schema)
     const res = this.validate(value)
     if (!res.valid) {
       throw res.error
@@ -237,10 +281,8 @@ export class ObjectIdMongoType extends JsType implements IMongoType {
     return new ObjectId(value)
   }
   public deserialize(value: any, schema: IJsSchema) {
-    if (value === undefined) {
-      return schema.default
-    }
-    const res = this.validate(value)
+    value = this.getExpectedValue(value, schema)
+    const res = this.deserializationValidate(value)
     if (!res.valid) {
       throw res.error
     }
