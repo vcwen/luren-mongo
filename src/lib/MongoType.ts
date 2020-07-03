@@ -6,7 +6,6 @@ import {
   IJsonSchema,
   IJsSchema,
   IJsType,
-  IValidationResult,
   JsType,
   ObjectType,
   ValidationError,
@@ -152,7 +151,7 @@ export class LongMongoType extends MongoPrimitiveType implements IMongoType {
 
 // tslint:disable-next-line: max-classes-per-file
 export class DateMongoType extends DateType implements IMongoType {
-  public validate(value: any): IValidationResult {
+  public validate(value: any): ValidationResult {
     if (value instanceof Date) {
       return ValidationResult.ok()
     } else {

@@ -22,7 +22,7 @@
     "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.156",
     "jest": "^26.1.0",
-    "luren-schema": "^0.2.2",
+    "luren-schema": "^0.2.4",
     "mongodb-memory-server": "^6.4.1",
     "mongodb-memory-server-core": "^6.4.1",
     "ts-jest": "^26.1.1",

@@ -2817,10 +2817,10 @@ log-driver@^1.2.7:
   resolved "https://registry.npm.taobao.org/log-driver/download/log-driver-1.2.7.tgz#63b95021f0702fedfa2c9bb0a24e7797d71871d8"
   integrity sha1-Y7lQIfBwL+36LJuwok53l9cYcdg=
 
-luren-schema@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.2.2.tgz#ed98afb8d9dc1e95871ada286f85f47b933c29b1"
-  integrity sha1-7ZivuNncHpWHGtoob4X0e5M8KbE=
+luren-schema@^0.2.4:
+  version "0.2.4"
+  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.2.4.tgz?cache=0&sync_timestamp=1593789566305&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fluren-schema%2Fdownload%2Fluren-schema-0.2.4.tgz#24ef8749b9fef6df9acdcf2d1f4ceb6dbeb03f84"
+  integrity sha1-JO+HSbn+9t+azc8tH0zrbb6wP4Q=
   dependencies:
     ajv "^6.10.2"
     coveralls "^3.0.7"

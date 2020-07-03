@@ -1,11 +1,11 @@
-import { IJsSchema, IValidationResult, JsType, ValidationResult } from 'luren-schema'
+import { IJsSchema, JsType, ValidationResult } from 'luren-schema'
 import { ObjectId } from 'mongodb'
 export class ObjectIdType extends JsType {
   public type: string = 'object'
   public toJsonSchema() {
     return { type: 'string' }
   }
-  public validate(val: any): IValidationResult {
+  public validate(val: any): ValidationResult {
     if (val === undefined || ObjectId.isValid(val)) {
       return ValidationResult.ok()
     } else {
@@ -22,7 +22,7 @@ export class ObjectIdType extends JsType {
     }
     return new ObjectId(value).toHexString()
   }
-  public deserializationValidate(val: any): IValidationResult {
+  public deserializationValidate(val: any): ValidationResult {
     if (val === undefined || ObjectId.isValid(val)) {
       return ValidationResult.ok()
     } else {
