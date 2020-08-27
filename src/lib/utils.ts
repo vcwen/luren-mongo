@@ -24,16 +24,17 @@ export const debug = (msg: string, ...params: any[]) => {
   debugLog(msg, ...params)
 }
 
-const mongoPreprocessor = (simpleSchema: any) => {
+const mongoPreprocessor = (simpleSchema: any): [any, boolean?] => {
   if (typeof simpleSchema === 'function') {
     const schemaMetadata: MongoSchemaMetadata | undefined = Reflect.getMetadata(
       MetadataKey.MONGO_SCHEMA,
       simpleSchema.prototype
     )
     if (schemaMetadata) {
-      return schemaMetadata.schema
+      return [schemaMetadata.schema, true]
     }
   }
+  return [simpleSchema]
 }
 export const mongoConvertSimpleTypeToJsSchema = (simpleSchema: any) => {
   return utils.convertSimpleSchemaToJsSchema(simpleSchema, mongoPreprocessor)

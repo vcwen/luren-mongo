@@ -119,6 +119,7 @@ describe('DataSource', () => {
       ;(MongoClient as any).disableMock = true
       const uri = await mongoServer.getConnectionString()
       dataSource = new DataSource({ uri })
+      dataSource.connect()
       // tslint:disable-next-line: max-classes-per-file
       class Some {
         // empty class

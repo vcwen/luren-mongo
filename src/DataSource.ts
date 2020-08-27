@@ -8,6 +8,7 @@ import { debug, deleteProperties } from './lib/utils'
 import { getDatabase } from './lib/utils'
 import { IQueryExecutor, QueryExecutor } from './QueryExecutor'
 import { Constructor } from './types'
+import { EventEmitter } from 'events'
 
 const DEFAULT_HOST = 'localhost'
 const DEFAULT_PORT = 27017
@@ -31,10 +32,17 @@ export class DataSource implements IDataSource {
   private _models: Set<Constructor> = Set()
   private _connectUri?: string
   private _connectOptions?: IMongoDataSourceOptions
-  private _clientPromise?: Promise<MongoClient>
+  private _clientPromise: Promise<MongoClient>
   private _queryExecutors: Map<string, QueryExecutor<any>> = Map()
   private _database?: string
+  private _clientEventEmitter: EventEmitter = new EventEmitter()
   constructor(options?: IMongoDataSourceOptions) {
+    this._clientPromise = new Promise((resolve, reject) => {
+      this._clientEventEmitter.on('created', (client: MongoClient) => {
+        resolve(client)
+      })
+      this._clientEventEmitter.on('error', (err) => reject(err))
+    })
     if (options) {
       if (options.autoConnect) {
         this.connect(options)
@@ -52,14 +60,18 @@ export class DataSource implements IDataSource {
       options.auth = { user: options.user, password: options.password }
     }
     deleteProperties(options, ['uri', 'host', 'port', 'database', 'user', 'password', 'autoConnect'])
-    this._clientPromise = MongoClient.connect(this._connectUri, {
+    MongoClient.connect(this._connectUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       ...options
-    } as MongoClientOptions).then((client) => {
-      debug(`connected to ${this._connectUri}`)
-      return client
-    })
+    } as MongoClientOptions)
+      .then((client) => {
+        debug(`connected to ${this._connectUri}`)
+        this._clientEventEmitter.emit('created', client)
+      })
+      .catch((err) => {
+        this._clientEventEmitter.emit('error', err)
+      })
   }
   public async getClient() {
     return this._clientPromise
