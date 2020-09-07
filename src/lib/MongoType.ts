@@ -10,7 +10,8 @@ import {
   ObjectType,
   ValidationError,
   ValidationResult,
-  PrimitiveType
+  PrimitiveType,
+  IPropertyResult
 } from 'luren-schema'
 import { copyProperties } from 'luren-schema/dist/lib/utils'
 import { ObjectId } from 'mongodb'
@@ -55,26 +56,6 @@ export abstract class MongoType extends JsType implements IMongoType {
 export abstract class MongoPrimitiveType extends PrimitiveType implements IMongoType {
   public abstract type: string
   public abstract toBsonSchema(schema: IJsSchema, options?: IJsTypeOptions): IBsonSchema
-  public deserialize(value: any, schema: IJsSchema): any {
-    value = this.getExpectedValue(value, schema)
-    const res = this.validate(value, schema)
-    if (!res.valid) {
-      throw res.error
-    }
-    return value
-  }
-  public serialize(value: any | undefined, schema: IJsSchema): any {
-    value = this.getExpectedValue(value, schema)
-    const res = this.validate(value, schema)
-    if (!res.valid) {
-      throw res.error
-    }
-    if (value === undefined && schema) {
-      return schema.default
-    } else {
-      return value
-    }
-  }
 }
 
 // tslint:disable-next-line: max-classes-per-file
@@ -159,7 +140,7 @@ export class DateMongoType extends DateType implements IMongoType {
     }
   }
   public serialize(value: any | undefined, schema: IJsSchema): Date {
-    value = this.getExpectedValue(value, schema)
+    value = value ?? this.getDefaultValue(schema)
     const res = this.validate(value)
     if (!res.valid) {
       throw res.error
@@ -174,7 +155,7 @@ export class DateMongoType extends DateType implements IMongoType {
     }
   }
   public deserialize(value: any | undefined, schema: IJsSchema): Date {
-    value = this.getExpectedValue(value, schema)
+    value = value ?? this.getDefaultValue(schema)
     const res = this.deserializationValidate(value)
     if (!res.valid) {
       throw res.error
@@ -221,9 +202,20 @@ export class ArrayMongoType extends ArrayType implements IMongoType {
 }
 // tslint:disable-next-line: max-classes-per-file
 export class ObjectMongoType extends ObjectType implements IMongoType {
+  protected interceptProp(action: keyof this & string, prop: string, value: any, schema: IJsSchema): IPropertyResult {
+    switch (action) {
+      case 'invalidate':
+      case 'serialize':
+      case 'toJsonSchema':
+      case 'toBsonSchema':
+        if (schema.composed) {
+          return { prop, value, skip: true }
+        }
+    }
+    return super.interceptProp(action, prop, value, schema)
+  }
   public toBsonSchema(schema: IJsSchema) {
     const bsonSchema: IBsonSchema = { bsonType: 'object' }
-
     const properties = schema.properties
     if (!properties) {
       return bsonSchema
@@ -257,31 +249,39 @@ export class ObjectIdMongoType extends JsType implements IMongoType {
   public toBsonSchema() {
     return { bsonType: 'objectId' }
   }
-  public deserializationValidate(val: any) {
-    if (val === undefined || ObjectId.isValid(val)) {
+  public deserializationValidate(val: any, schema: IJsSchema) {
+    if (_.isNil(val)) {
+      return this.isDefaultValueValid(schema)
+    }
+    if (ObjectId.isValid(val)) {
       return ValidationResult.ok()
     } else {
       return ValidationResult.error(`Invalid ObjectId: ${val}`)
     }
   }
-  public validate(val: any) {
-    if (val === undefined || ObjectId.isValid(val)) {
+  public validate(val: any, schema: IJsSchema) {
+    if (_.isNil(val)) {
+      return this.isDefaultValueValid(schema)
+    }
+    if (ObjectId.isValid(val)) {
       return ValidationResult.ok()
     } else {
       return ValidationResult.error(`Invalid ObjectId: ${val}`)
     }
   }
   public serialize(value: ObjectId | undefined, schema: IJsSchema) {
-    value = this.getExpectedValue(value, schema)
-    const res = this.validate(value)
+    value = value ?? this.getDefaultValue(schema)
+    const res = this.validate(value, schema)
     if (!res.valid) {
       throw res.error
     }
     return new ObjectId(value)
   }
   public deserialize(value: any, schema: IJsSchema) {
-    value = this.getExpectedValue(value, schema)
-    const res = this.deserializationValidate(value)
+    if (_.isNil(value)) {
+      return this.getDefaultValue(schema)
+    }
+    const res = this.deserializationValidate(value, schema)
     if (!res.valid) {
       throw res.error
     }

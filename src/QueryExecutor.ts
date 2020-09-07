@@ -25,7 +25,8 @@ import {
   UpdateManyOptions,
   UpdateOneOptions,
   UpdateQuery,
-  BulkWriteOperation
+  BulkWriteOperation,
+  FindOneOptions
 } from 'mongodb'
 import { RelationType } from './constants'
 import { MetadataKey } from './constants'
@@ -148,7 +149,7 @@ export class QueryExecutor<T extends object> extends BaseQueryExecutor<T> {
       }
     } else {
       debug(`${this._collection.collectionName}.findOne(%o, %o)`, filter, options)
-      const res = await this._collection.findOne(filter, options)
+      const res = await this._collection.findOne(filter, options as FindOneOptions<any>)
       if (res) {
         const obj = deserializeDocument(res, options, this._schema)
         return obj
@@ -180,7 +181,7 @@ export class QueryExecutor<T extends object> extends BaseQueryExecutor<T> {
       return res.map((item) => deserializeDocument(item, options, this._schema))
     } else {
       debug(`${this._collection.collectionName}.find(%o, %o)`, filter, options)
-      const res = await this._collection.find(filter, options).toArray()
+      const res = await this._collection.find<T>(filter, options as FindOneOptions<any>).toArray()
       return res.map((item) => deserializeDocument(item, options, this._schema))
     }
   }

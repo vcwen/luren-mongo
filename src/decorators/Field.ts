@@ -8,6 +8,7 @@ export interface IFieldOptions {
   schema?: IJsSchema
   required?: boolean
   default?: any
+  composed?: boolean
 }
 
 export class FieldMetadata {
@@ -37,6 +38,9 @@ export function Field(options?: IFieldOptions) {
     }
     if (options.default !== undefined) {
       fieldSchema.default = options.default
+    }
+    if (options.composed) {
+      fieldSchema.composed = true
     }
     const fieldMetadata = new FieldMetadata(fieldSchema)
     fieldMetadata.required = fieldRequired !== undefined ? fieldRequired : true

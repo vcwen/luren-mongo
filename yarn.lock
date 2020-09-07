@@ -682,9 +682,9 @@
     "@babel/types" "^7.3.0"
 
 "@types/bson@*":
-  version "4.0.0"
-  resolved "https://registry.npm.taobao.org/@types/bson/download/@types/bson-4.0.0.tgz#9073772679d749116eb1dfca56f8eaac6d59cc7a"
-  integrity sha1-kHN3JnnXSRFusd/KVvjqrG1ZzHo=
+  version "4.0.2"
+  resolved "https://registry.npm.taobao.org/@types/bson/download/@types/bson-4.0.2.tgz#7accb85942fc39bbdb7515d4de437c04f698115f"
+  integrity sha1-esy4WUL8ObvbdRXU3kN8BPaYEV8=
   dependencies:
     "@types/node" "*"
 
@@ -791,10 +791,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/mongodb@^3.5.24":
-  version "3.5.24"
-  resolved "https://registry.npm.taobao.org/@types/mongodb/download/@types/mongodb-3.5.24.tgz#2f8cad64c327b6693610d30bd7ffc908efe303a6"
-  integrity sha1-L4ytZMMntmk2ENML1//JCO/jA6Y=
+"@types/mongodb@^3.5.27":
+  version "3.5.27"
+  resolved "https://registry.npm.taobao.org/@types/mongodb/download/@types/mongodb-3.5.27.tgz?cache=0&sync_timestamp=1599138322775&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2F%40types%2Fmongodb%2Fdownload%2F%40types%2Fmongodb-3.5.27.tgz#158a7a43ce25ef3592ac8a62e62ab38bebf661f2"
+  integrity sha1-FYp6Q84l7zWSrIpi5iqzi+v2YfI=
   dependencies:
     "@types/bson" "*"
     "@types/node" "*"
@@ -2817,10 +2817,10 @@ log-driver@^1.2.7:
   resolved "https://registry.npm.taobao.org/log-driver/download/log-driver-1.2.7.tgz#63b95021f0702fedfa2c9bb0a24e7797d71871d8"
   integrity sha1-Y7lQIfBwL+36LJuwok53l9cYcdg=
 
-luren-schema@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.2.6.tgz?cache=0&sync_timestamp=1598527722676&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fluren-schema%2Fdownload%2Fluren-schema-0.2.6.tgz#6ef15b185bda1efe99c0aa340c03c7e0956a11be"
-  integrity sha1-bvFbGFvaHv6ZwKo0DAPH4JVqEb4=
+luren-schema@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.npm.taobao.org/luren-schema/download/luren-schema-0.2.7.tgz?cache=0&sync_timestamp=1599227321721&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fluren-schema%2Fdownload%2Fluren-schema-0.2.7.tgz#81b7ed7e4f0be878479390bb1e5d1a202e557eac"
+  integrity sha1-gbftfk8L6HhHk5C7Hl0aIC5Vfqw=
   dependencies:
     ajv "^6.10.2"
     coveralls "^3.0.7"
@@ -3018,10 +3018,10 @@ mongodb@^3.5.4:
   optionalDependencies:
     saslprep "^1.0.0"
 
-mongodb@^3.5.9:
-  version "3.5.9"
-  resolved "https://registry.npm.taobao.org/mongodb/download/mongodb-3.5.9.tgz?cache=0&sync_timestamp=1591967946651&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fmongodb%2Fdownload%2Fmongodb-3.5.9.tgz#799b72be8110b7e71a882bb7ce0d84d05429f772"
-  integrity sha1-eZtyvoEQt+caiCu3zg2E0FQp93I=
+mongodb@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.npm.taobao.org/mongodb/download/mongodb-3.6.0.tgz#babd7172ec717e2ed3f85e079b3f1aa29dce4724"
+  integrity sha1-ur1xcuxxfi7T+F4Hmz8aop3ORyQ=
   dependencies:
     bl "^2.2.0"
     bson "^1.1.4"

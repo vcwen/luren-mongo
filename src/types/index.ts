@@ -11,10 +11,10 @@ export interface IDeserializeOptions {
   schema?: IJsSchema
   deserialize?: boolean
 }
-export interface IFindOptions<T = any> extends FindOneOptions, IDeserializeOptions {
-  lookup?: keyof T | Array<keyof T>
+export interface IFindOptions<T = any> extends FindOneOptions<T>, IDeserializeOptions {
+  lookup?: keyof T | (keyof T)[]
 }
 
-export interface IFindOneAndDeleteOptions extends FindOneAndDeleteOption, IDeserializeOptions {}
-export interface IFindOneAndReplaceOptions extends FindOneAndReplaceOption, IDeserializeOptions {}
-export interface IFindOneAndUpdateOptions extends FindOneAndUpdateOption, IDeserializeOptions {}
+export interface IFindOneAndDeleteOptions<T = any> extends FindOneAndDeleteOption<T>, IDeserializeOptions {}
+export interface IFindOneAndReplaceOptions<T = any> extends FindOneAndReplaceOption<T>, IDeserializeOptions {}
+export interface IFindOneAndUpdateOptions<T = any> extends FindOneAndUpdateOption<T>, IDeserializeOptions {}

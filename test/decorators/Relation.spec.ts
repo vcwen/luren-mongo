@@ -22,7 +22,14 @@ describe('Relation', () => {
     const fields: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, target)
     expect(fields.get('foo')).toEqual({
       required: false,
-      schema: { type: 'object', classConstructor: Foo, properties: { bar: { type: 'number' } }, required: ['bar'] }
+
+      schema: {
+        type: 'object',
+        composed: true,
+        classConstructor: Foo,
+        properties: { bar: { type: 'number' } },
+        required: ['bar']
+      }
     })
   })
   it('should create one to many relation', () => {
@@ -55,7 +62,13 @@ describe('Relation', () => {
       required: false,
       schema: {
         type: 'array',
-        items: { type: 'object', classConstructor: Foo, properties: { bar: { type: 'number' } }, required: ['bar'] }
+        composed: true,
+        items: {
+          type: 'object',
+          classConstructor: Foo,
+          properties: { bar: { type: 'number' } },
+          required: ['bar']
+        }
       }
     })
     expect(fields.get('another')).toEqual({

@@ -35,7 +35,7 @@ export function Relation(options: IRelationOptions) {
     const fieldMap: Map<string, FieldMetadata> = Reflect.getMetadata(MetadataKey.FIELDS, target) || Map()
     if (!fieldMap.has(propertyKey)) {
       const type = options.type === RelationType.ONE_TO_ONE ? options.target : [options.target]
-      const fieldOptions: IFieldOptions = { type, required: false }
+      const fieldOptions: IFieldOptions = { type, required: false, composed: true }
       Field(fieldOptions)(target, propertyKey)
     }
   }

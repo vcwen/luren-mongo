@@ -7,11 +7,11 @@
   "author": "Vincent Wen <wenwei1202@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "@types/mongodb": "^3.5.24",
+    "@types/mongodb": "^3.5.27",
     "debug": "^4.1.1",
     "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.15",
-    "mongodb": "^3.5.9",
+    "mongodb": "^3.6.0",
     "reflect-metadata": "^0.1.13"
   },
   "peerDependencies": {
@@ -22,7 +22,7 @@
     "@types/jest": "^26.0.0",
     "@types/lodash": "^4.14.156",
     "jest": "^26.1.0",
-    "luren-schema": "^0.2.6",
+    "luren-schema": "^0.2.7",
     "mongodb-memory-server": "^6.4.1",
     "mongodb-memory-server-core": "^6.4.1",
     "ts-jest": "^26.1.1",
@@ -31,7 +31,7 @@
     "typescript": "^3.9.5"
   },
   "publishConfig": {
-    "registry": "https://registry.npmjs.com"
+    "registry": "https://registry.npmjs.org"
   },
   "engines": {
     "node": ">= 10"
