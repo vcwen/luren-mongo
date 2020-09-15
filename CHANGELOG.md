@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/vcwen/luren-mongo/compare/v0.1.4...v0.1.5) (2020-09-15)
+
+
+### Bug Fixes
+
+* **type:** fix type class ([eecdf53](https://github.com/vcwen/luren-mongo/commit/eecdf53c5ce27b5b2dc34c27cc1b8827b2cb42cd))
+
 ### [0.1.4](https://github.com/vcwen/luren-mongo/compare/v0.1.3...v0.1.4) (2020-09-09)
 
 ### [0.1.3](https://github.com/vcwen/luren-mongo/compare/v0.1.2...v0.1.3) (2020-09-07)
