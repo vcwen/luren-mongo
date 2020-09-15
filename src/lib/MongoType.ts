@@ -139,11 +139,16 @@ export class DateMongoType extends DateType implements IMongoType {
       return new ValidationResult(true, new ValidationError(`invalid date value: ${value}`))
     }
   }
-  public serialize(value: any | undefined, schema: IJsSchema): Date {
-    value = value ?? this.getDefaultValue(schema)
+  public serialize(value: any | undefined, schema: IJsSchema): Date | undefined {
+    if (_.isNil(value)) {
+      value = this.getDefaultValue(schema)
+    }
+    if (_.isNil(value)) {
+      return
+    }
     const res = this.validate(value)
     if (!res.valid) {
-      throw res.error
+      throw res.error!
     }
     return new Date(value)
   }
@@ -155,7 +160,9 @@ export class DateMongoType extends DateType implements IMongoType {
     }
   }
   public deserialize(value: any | undefined, schema: IJsSchema): Date {
-    value = value ?? this.getDefaultValue(schema)
+    if (_.isNil(value)) {
+      return this.getDefaultValue(schema)
+    }
     const res = this.deserializationValidate(value)
     if (!res.valid) {
       throw res.error

@@ -1,5 +1,7 @@
 import { IJsSchema, JsType, ValidationResult } from 'luren-schema'
 import { ObjectId } from 'mongodb'
+import _ from 'lodash'
+
 export class ObjectIdType extends JsType {
   public type: string = 'object'
   public toJsonSchema() {
@@ -13,14 +15,17 @@ export class ObjectIdType extends JsType {
     }
   }
   public serialize(value: ObjectId | undefined, schema: IJsSchema) {
-    if (value === undefined) {
-      return schema.default
+    if (_.isNil(value)) {
+      value = this.getDefaultValue(schema)
+    }
+    if (_.isNil(value)) {
+      return
     }
     const res = this.validate(value)
     if (!res.valid) {
       throw res.error
     }
-    return new ObjectId(value).toHexString()
+    return value.toHexString()
   }
   public deserializationValidate(val: any): ValidationResult {
     if (val === undefined || ObjectId.isValid(val)) {
@@ -31,13 +36,14 @@ export class ObjectIdType extends JsType {
   }
 
   public deserialize(value: any, schema: IJsSchema) {
-    if (value === undefined) {
+    if (_.isNil(value)) {
       return this.getDefaultValue(schema)
+    } else {
+      const res = this.deserializationValidate(value)
+      if (!res.valid) {
+        throw res.error
+      }
+      return new ObjectId(value)
     }
-    const res = this.deserializationValidate(value)
-    if (!res.valid) {
-      throw res.error
-    }
-    return new ObjectId(value)
   }
 }
