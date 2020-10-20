@@ -127,6 +127,9 @@ export class QueryExecutor<T extends object> extends BaseQueryExecutor<T> {
       const pipeline: any[] = []
       const match = { $match: filter }
       pipeline.push(match)
+      if (options.sort) {
+        pipeline.push({ $sort: options.sort })
+      }
       const relations = Array.isArray(options.lookup) ? options.lookup : [options.lookup]
       for (const prop of relations) {
         const relation: RelationMetadata | undefined = Reflect.getMetadata(
@@ -163,6 +166,9 @@ export class QueryExecutor<T extends object> extends BaseQueryExecutor<T> {
       const pipeline: any[] = []
       const match = { $match: filter }
       pipeline.push(match)
+      if (options.sort) {
+        pipeline.push({ $sort: options.sort })
+      }
       const relations = Array.isArray(options.lookup) ? options.lookup : [options.lookup]
       for (const prop of relations) {
         const relation: RelationMetadata | undefined = Reflect.getMetadata(
