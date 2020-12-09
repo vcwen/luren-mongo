@@ -76,20 +76,13 @@ export class DataSource implements IDataSource {
   public async getClient() {
     return this._clientPromise
   }
-  public async getClientMust() {
-    if (this._clientPromise) {
-      return this._clientPromise
-    } else {
-      throw new Error('No client available, needs to connect to the database first')
-    }
-  }
   public async getQueryExecutor<T extends object>(model: Constructor<T>): Promise<QueryExecutor<T>> {
     const metadata: CollectionMetadata | undefined = Reflect.getOwnMetadata(MetadataKey.COLLECTION, model.prototype)
     if (!metadata) {
       throw new Error(`class ${model.name} has not been bound to a collection`)
     }
     if (!this._queryExecutors.has(metadata.name)) {
-      const client = await this.getClientMust()
+      const client = await this.getClient()
       const db = metadata.database || this._database
       if (!db) {
         throw new Error('database name is required')
@@ -113,11 +106,11 @@ export class DataSource implements IDataSource {
     if (!collectionMetadata) {
       return false
     }
+    const client = await this.getClient()
     const dbName = collectionMetadata.database || this._database
     if (!dbName) {
       throw new Error(`No valid database for ${model.name}`)
     }
-    const client = await this.getClientMust()
     const db = client.db(dbName)
     const validationOptions = collectionMetadata.validationOptions
     let validation: { validator: object; validationLevel: string; validationAction: string } | undefined
