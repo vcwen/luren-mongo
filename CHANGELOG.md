@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.7](https://github.com/vcwen/luren-mongo/compare/v0.1.6...v0.1.7) (2020-12-09)
+
+
+### Bug Fixes
+
+* **datasource.ts:** fix get database name before connect ([35836e1](https://github.com/vcwen/luren-mongo/commit/35836e1b47f118f9a4f9a5c19ba91d1ef5b2d70e))
+
 ### [0.1.6](https://github.com/vcwen/luren-mongo/compare/v0.1.5...v0.1.6) (2020-10-20)
 
 
